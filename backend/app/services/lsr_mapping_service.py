@@ -154,7 +154,8 @@ class LsrMappingService:
                     failed += 1
                     results.append({"report_id": rid, "status": "FAILED", "error": str(exc)})
 
-        await asyncio.gather(*[_map_one(rid) for rid in targets])
+        for rid in targets:
+            await _map_one(rid)
 
         return BatchLsrMappingResponse(
             requested=requested,

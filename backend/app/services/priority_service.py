@@ -153,7 +153,8 @@ class PriorityService:
                     failed += 1
                     results.append({"report_id": rid, "status": "FAILED", "error": str(exc)})
 
-        await asyncio.gather(*[_calc_one(rid) for rid in targets])
+        for rid in targets:
+            await _calc_one(rid)
 
         return BatchPriorityResponse(
             requested=requested,

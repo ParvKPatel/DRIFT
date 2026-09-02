@@ -228,7 +228,8 @@ class SafetyExtractionService:
                     failed += 1
                     results.append({"report_id": rid, "status": "FAILED", "error": str(exc)})
 
-        await asyncio.gather(*[_analyze_one(rid) for rid in targets])
+        for rid in targets:
+            await _analyze_one(rid)
 
         return BatchAnalysisResultResponse(
             requested=requested,
@@ -408,6 +409,17 @@ class SafetyExtractionService:
         ev_result = await db.execute(ev_stmt)
         ev_items = ev_result.scalars().all()
 
+        ev_by_field: Dict[str, str] = {
+            str(e.field_name): str(e.evidence_text)
+            for e in ev_items
+            if e.field_name and e.evidence_text
+        }
+
+        def _get_ev(field_name: str, fallback: Any = None) -> Optional[str]:
+            if field_name in ev_by_field:
+                return ev_by_field[field_name]
+            return str(fallback) if fallback is not None else None
+
         return AnalysisResultResponse(
             report_id=report_id,
             analysis_status=sa.analysis_status or AnalysisStatus.COMPLETED,
@@ -417,39 +429,39 @@ class SafetyExtractionService:
             analyzed_at=sa.analyzed_at,
             is_mock=sa.is_mock or False,
             activity=sa.activity,
-            activity_evidence=next((e.evidence_text for e in ev_items if e.field_name == "activity"), None),
+            activity_evidence=_get_ev("activity"),
             activity_evidence_status=sa.activity_evidence_status,
             activity_confidence=sa.activity_confidence,
             equipment=sa.equipment,
-            equipment_evidence=next((e.evidence_text for e in ev_items if e.field_name == "equipment"), None),
+            equipment_evidence=_get_ev("equipment"),
             equipment_evidence_status=sa.equipment_evidence_status,
             equipment_confidence=sa.equipment_confidence,
             hazard=sa.hazard,
-            hazard_evidence=next((e.evidence_text for e in ev_items if e.field_name == "hazard"), None),
+            hazard_evidence=_get_ev("hazard"),
             hazard_evidence_status=sa.hazard_evidence_status,
             hazard_confidence=sa.hazard_confidence,
             energy_source=str(sa.energy_source.value) if sa.energy_source else None,
-            energy_source_evidence=sa.energy_source_evidence,
+            energy_source_evidence=_get_ev("energy_source", sa.energy_source_evidence),
             energy_source_evidence_status=sa.energy_source_evidence_status,
             energy_source_confidence=sa.energy_source_confidence,
             exposure=sa.exposure,
-            exposure_evidence=sa.exposure_evidence,
+            exposure_evidence=_get_ev("exposure", sa.exposure_evidence),
             exposure_evidence_status=sa.exposure_evidence_status,
             exposure_confidence=sa.exposure_confidence,
             exposure_location=sa.exposure_location,
-            exposure_location_evidence=sa.exposure_location_evidence,
+            exposure_location_evidence=_get_ev("exposure_location", sa.exposure_location_evidence),
             exposure_location_evidence_status=sa.exposure_location_evidence_status,
             exposure_location_confidence=sa.exposure_location_confidence,
             barrier=sa.barrier,
-            barrier_evidence=sa.barrier_evidence,
+            barrier_evidence=_get_ev("barrier", sa.barrier_evidence),
             barrier_evidence_status=sa.barrier_evidence_status,
             barrier_confidence=sa.barrier_confidence,
             barrier_condition=str(sa.barrier_condition.value) if sa.barrier_condition else None,
-            barrier_condition_evidence=sa.barrier_condition_evidence,
+            barrier_condition_evidence=_get_ev("barrier_condition", sa.barrier_condition_evidence),
             barrier_condition_evidence_status=sa.barrier_condition_evidence_status,
             barrier_condition_confidence=sa.barrier_condition_confidence,
             potential_consequence=sa.potential_consequence,
-            potential_consequence_evidence=sa.potential_consequence_evidence,
+            potential_consequence_evidence=_get_ev("potential_consequence", sa.potential_consequence_evidence),
             potential_consequence_evidence_status=sa.potential_consequence_evidence_status,
             potential_consequence_confidence=sa.potential_consequence_confidence,
             evidence_items=[EvidenceItemResponse.model_validate(e) for e in ev_items],
