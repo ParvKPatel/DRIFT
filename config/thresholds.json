@@ -1,0 +1,19 @@
+{
+  "escalation_bands": [
+    {"name": "LOW", "min_score": 0, "max_score": 29, "color": "blue"},
+    {"name": "WATCH", "min_score": 30, "max_score": 49, "color": "yellow"},
+    {"name": "REVIEW", "min_score": 50, "max_score": 69, "color": "amber"},
+    {"name": "HIGH", "min_score": 70, "max_score": 84, "color": "orange"},
+    {"name": "CRITICAL", "min_score": 85, "max_score": 100, "color": "red"}
+  ],
+  "sif_confidence_thresholds": {
+    "high": 0.85,
+    "medium": 0.60,
+    "low": 0.35
+  },
+  "clustering": {
+    "min_reports_per_cluster": 3,
+    "similarity_threshold": 0.78,
+    "time_window_days": 90
+  }
+}

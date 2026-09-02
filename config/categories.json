@@ -1,0 +1,18 @@
+{
+  "incident_types": [
+    "Unsafe Act",
+    "Unsafe Condition",
+    "Near Miss",
+    "First Aid Incident",
+    "Medical Treatment Case",
+    "Restricted Work Case",
+    "Lost Time Injury",
+    "Property Damage"
+  ],
+  "affected_person_types": [
+    "Employee",
+    "Contractor",
+    "Visitor",
+    "Third Party"
+  ]
+}

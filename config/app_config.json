@@ -1,0 +1,11 @@
+{
+  "name": "OIL SENTINEL",
+  "version": "0.1.0-phase1",
+  "description": "AI/NLP Engine to Detect Serious Injury & Fatality (SIF) Precursors in Unsafe-Act, Unsafe-Condition, Near-Miss and Incident Reports",
+  "architecture_version": "1.0",
+  "default_currency": "INR",
+  "max_upload_rows": 10000,
+  "default_page_size": 25,
+  "demo_mode": true,
+  "evidence_strictness": "HIGH"
+}

@@ -1,0 +1,35 @@
+import React from 'react';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
+
+interface ErrorStateProps {
+  title?: string;
+  message?: string;
+  onRetry?: () => void;
+}
+
+export const ErrorState: React.FC<ErrorStateProps> = ({
+  title = 'System Error',
+  message = 'An unexpected error occurred while communicating with the backend safety engine.',
+  onRetry,
+}) => {
+  return (
+    <div className="flex flex-col items-center justify-center p-8 text-center border border-red-900/60 rounded bg-red-950/20">
+      <AlertTriangle className="w-8 h-8 text-red-400 mb-2" />
+      <h4 className="text-sm font-mono font-semibold text-red-300 uppercase tracking-wide">
+        {title}
+      </h4>
+      <p className="text-xs text-red-400 max-w-md mt-1 mb-4 font-mono">
+        {message}
+      </p>
+      {onRetry && (
+        <button
+          onClick={onRetry}
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded text-xs font-mono bg-red-900/40 hover:bg-red-900/60 text-red-200 border border-red-800 transition-colors"
+        >
+          <RefreshCw className="w-3.5 h-3.5" />
+          Retry Connection
+        </button>
+      )}
+    </div>
+  );
+};

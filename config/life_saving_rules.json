@@ -1,0 +1,56 @@
+[
+  {
+    "id": "LSR-01",
+    "name": "Bypassing Safety Controls",
+    "description": "Obtain authorization before overriding or disabling safety controls",
+    "keywords": ["bypass", "override", "disable", "interlock", "safety device", "jumper", "trip", "tamper"]
+  },
+  {
+    "id": "LSR-02",
+    "name": "Confined Space",
+    "description": "Obtain authorization before entering a confined space",
+    "keywords": ["confined space", "tank entry", "vessel", "vault", "pit", "atmospheric testing", "oxygen deficiency"]
+  },
+  {
+    "id": "LSR-03",
+    "name": "Driving",
+    "description": "Follow safe driving rules",
+    "keywords": ["driving", "seatbelt", "speeding", "distracted driving", "vehicle", "forklift", "light vehicle", "mobile phone"]
+  },
+  {
+    "id": "LSR-04",
+    "name": "Energy Isolation",
+    "description": "Verify isolation before work begins and use the specified life-protecting equipment",
+    "keywords": ["lockout", "tagout", "LOTO", "isolation", "de-energize", "zero energy state", "blinding", "spading"]
+  },
+  {
+    "id": "LSR-05",
+    "name": "Hot Work",
+    "description": "Control flammables and ignition sources",
+    "keywords": ["hot work", "welding", "cutting", "grinding", "spark", "gas test", "fire watch", "ignition"]
+  },
+  {
+    "id": "LSR-06",
+    "name": "Line Break",
+    "description": "Verify isolation before opening line or equipment",
+    "keywords": ["line break", "flange break", "pipe opening", "process opening", "hazardous fluid", "bleed", "vent"]
+  },
+  {
+    "id": "LSR-07",
+    "name": "Safe Mechanical Lifting",
+    "description": "Plan lifting operations and control the area",
+    "keywords": ["crane", "rigging", "lifting", "suspended load", "sling", "hoist", "tag line", "drop zone", "banksman"]
+  },
+  {
+    "id": "LSR-08",
+    "name": "Work Authorisation",
+    "description": "Work with a valid permit when required",
+    "keywords": ["permit to work", "PTW", "work authorization", "risk assessment", "toolbox talk", "method statement"]
+  },
+  {
+    "id": "LSR-09",
+    "name": "Working at Height",
+    "description": "Protect yourself against falling when working at height",
+    "keywords": ["fall protection", "harness", "scaffolding", "lanyard", "anchor point", "handrail", "roof work", "working at height"]
+  }
+]
