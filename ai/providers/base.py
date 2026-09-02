@@ -9,7 +9,10 @@ Phase 4+: SIFReasoningProvider and EmbeddingProvider are used.
 """
 
 from abc import ABC, abstractmethod
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.schemas.safety_extraction import SafetyFactsExtractionResponse
 
 
 class SafetyExtractionProvider(ABC):
@@ -24,7 +27,7 @@ class SafetyExtractionProvider(ABC):
         self,
         narrative: str,
         context: Optional[Dict[str, Any]] = None,
-    ):
+    ) -> "SafetyFactsExtractionResponse":
         """
         Extracts structured safety facts from narrative text.
 

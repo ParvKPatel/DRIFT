@@ -23,12 +23,12 @@ export function DataTable<T>({
   className,
 }: DataTableProps<T>) {
   return (
-    <div className={cn('w-full overflow-x-auto border border-industrial-700 rounded bg-industrial-900', className)}>
+    <div className={cn('w-full overflow-x-auto border border-industrial-800 rounded-sm bg-transparent', className)}>
       <table className="w-full text-left text-xs font-sans">
-        <thead className="bg-industrial-850 border-b border-industrial-700 text-industrial-300 font-mono uppercase tracking-wider">
+        <thead className="bg-industrial-900 border-b border-industrial-800 text-industrial-500 font-sans font-bold uppercase tracking-wider">
           <tr>
             {columns.map((col, i) => (
-              <th key={i} className={cn('py-2.5 px-4 font-semibold', col.className)}>
+              <th key={i} className={cn('py-2.5 px-4', col.className)}>
                 {col.header}
               </th>
             ))}
@@ -37,7 +37,7 @@ export function DataTable<T>({
         <tbody className="divide-y divide-industrial-800">
           {data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="py-8 text-center text-industrial-400 font-mono">
+              <td colSpan={columns.length} className="py-8 text-center text-industrial-500 font-sans">
                 {emptyMessage}
               </td>
             </tr>
@@ -47,12 +47,12 @@ export function DataTable<T>({
                 key={rowIndex}
                 onClick={() => onRowClick && onRowClick(row)}
                 className={cn(
-                  'hover:bg-industrial-800/50 transition-colors',
+                  'hover:bg-industrial-900 transition-colors',
                   onRowClick && 'cursor-pointer'
                 )}
               >
                 {columns.map((col, colIndex) => (
-                  <td key={colIndex} className={cn('py-3 px-4 text-industrial-200', col.className)}>
+                  <td key={colIndex} className={cn('py-3 px-4 text-industrial-100', col.className)}>
                     {col.accessor(row)}
                   </td>
                 ))}

@@ -12,16 +12,16 @@ export const PriorityBadge: React.FC<PriorityBadgeProps> = ({ level = 'UNCERTAIN
   const getStyle = (val: string) => {
     switch (val) {
       case 'CRITICAL':
-        return 'bg-red-950/60 text-red-300 border-red-800';
+        return 'bg-black text-white border-black';
       case 'HIGH_PRIORITY_SIF_FPI_PRECURSOR':
-        return 'bg-orange-950/60 text-orange-300 border-orange-800';
+        return 'bg-industrial-500 text-white border-industrial-500';
       case 'SAFETY_REVIEW':
-        return 'bg-amber-950/60 text-amber-300 border-amber-800';
+        return 'bg-industrial-700 text-white border-industrial-700';
       case 'ROUTINE':
-        return 'bg-emerald-950/60 text-emerald-300 border-emerald-800';
+        return 'bg-industrial-900 text-industrial-400 border-industrial-900';
       case 'UNCERTAIN':
       default:
-        return 'bg-slate-900 text-slate-400 border-slate-700';
+        return 'bg-white text-industrial-400 border-industrial-700';
     }
   };
 
@@ -37,7 +37,7 @@ export const PriorityBadge: React.FC<PriorityBadgeProps> = ({ level = 'UNCERTAIN
   return (
     <div
       className={cn(
-        'inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-mono font-semibold border',
+        'inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-sans font-semibold border',
         getStyle(level),
         className
       )}

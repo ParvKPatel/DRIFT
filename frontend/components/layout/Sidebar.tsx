@@ -46,22 +46,22 @@ export const Sidebar: React.FC = () => {
   return (
     <aside
       className={cn(
-        'bg-industrial-900 border-r border-industrial-700 flex flex-col justify-between transition-all duration-200 shrink-0 z-30',
+        'bg-industrial-900 border-r border-industrial-800 flex flex-col justify-between transition-all duration-200 shrink-0 z-30',
         collapsed ? 'w-16' : 'w-64'
       )}
     >
       {/* Brand Header */}
-      <div className="h-16 px-4 border-b border-industrial-700 flex items-center justify-between">
+      <div className="h-16 px-4 border-b border-industrial-800 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 overflow-hidden">
-          <div className="w-8 h-8 rounded bg-red-950/80 border border-red-800 flex items-center justify-center text-red-400 shrink-0">
+          <div className="w-8 h-8 rounded bg-industrial-100 text-industrial-950 flex items-center justify-center shrink-0">
             <ShieldAlert className="w-5 h-5" />
           </div>
           {!collapsed && (
             <div className="flex flex-col">
-              <span className="font-mono font-bold text-sm tracking-wider text-industrial-100 uppercase">
+              <span className="font-sans font-bold text-sm tracking-wider text-industrial-100 uppercase">
                 OIL SENTINEL
               </span>
-              <span className="text-[10px] font-mono text-industrial-400 uppercase tracking-widest">
+              <span className="text-[10px] font-sans text-industrial-500 uppercase tracking-widest">
                 HSE Precursor AI
               </span>
             </div>
@@ -87,13 +87,13 @@ export const Sidebar: React.FC = () => {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded text-xs font-mono transition-colors',
+                'flex items-center gap-3 px-3 py-2.5 rounded text-xs font-sans transition-colors',
                 isActive
-                  ? 'bg-industrial-800 text-blue-400 font-semibold border-l-2 border-blue-500'
-                  : 'text-industrial-300 hover:bg-industrial-800/50 hover:text-industrial-100'
+                  ? 'bg-industrial-850 text-industrial-100 font-semibold'
+                  : 'text-industrial-400 hover:bg-industrial-850 hover:text-industrial-100'
               )}
             >
-              <Icon className={cn('w-4 h-4 shrink-0', isActive ? 'text-blue-400' : 'text-industrial-400')} />
+              <Icon className={cn('w-4 h-4 shrink-0', isActive ? 'text-industrial-100' : 'text-industrial-500')} />
               {!collapsed && <span>{item.label}</span>}
             </Link>
           );
@@ -101,20 +101,20 @@ export const Sidebar: React.FC = () => {
       </nav>
 
       {/* Footer Utilities */}
-      <div className="p-3 border-t border-industrial-700 bg-industrial-950/60 space-y-2">
-        <div className="flex items-center justify-between text-[11px] font-mono text-industrial-400">
+      <div className="p-3 border-t border-industrial-800 bg-industrial-950 space-y-2">
+        <div className="flex items-center justify-between text-[11px] font-sans text-industrial-500">
           <div className="flex items-center gap-1.5">
-            <Activity className="w-3.5 h-3.5 text-emerald-400" />
+            <div className="w-1.5 h-1.5 rounded-full bg-industrial-400" />
             {!collapsed && <span>SYS: ONLINE</span>}
           </div>
           {!collapsed && (
-            <span className="px-1.5 py-0.5 rounded bg-industrial-800 text-[10px] text-amber-400 border border-industrial-700">
+            <span className="px-1.5 py-0.5 rounded text-[10px] text-industrial-500 border border-industrial-800">
               DEMO MODE
             </span>
           )}
         </div>
         {!collapsed && (
-          <div className="flex items-center justify-between text-[11px] font-mono text-industrial-500 pt-1">
+          <div className="flex items-center justify-between text-[11px] font-sans text-industrial-500 pt-1">
             <span>v0.1.0-phase6</span>
             <Link href="#" className="hover:text-industrial-300 flex items-center gap-1">
               <Settings className="w-3 h-3" />

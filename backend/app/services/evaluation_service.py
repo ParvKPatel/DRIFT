@@ -28,6 +28,7 @@ from app.schemas.evaluation_schemas import (
     ConfusionMatrixData,
     LsrRuleMetric,
 )
+from app.schemas.safety_extraction import SafetyFactsExtractionResponse
 from app.services.evaluation_dataset import SYNTHETIC_EVALUATION_DATASET
 from app.services.sif_rule_engine import SafetyRuleEngine
 from app.services.lsr_engine import LsrEngine
@@ -73,7 +74,7 @@ class EvaluationService:
             # 1. Run safety extraction to get genuine extracted facts
             from ai.factory import get_safety_extraction_provider
             extractor = get_safety_extraction_provider()
-            facts_resp = await extractor.extract_safety_facts(narrative)
+            facts_resp: SafetyFactsExtractionResponse = await extractor.extract_safety_facts(narrative)
             facts = {
                 "activity": facts_resp.activity.value,
                 "equipment": facts_resp.equipment.value,

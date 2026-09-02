@@ -400,7 +400,7 @@ class SafetyExtractionService:
         """Build AnalysisResultResponse from existing DB records."""
         sa_stmt = select(SafetyAnalysis).where(SafetyAnalysis.report_id == report_id)
         sa_result = await db.execute(sa_stmt)
-        sa = sa_result.scalar_one_or_none()
+        sa: Any = sa_result.scalar_one_or_none()
 
         if sa is None:
             return None
@@ -471,7 +471,7 @@ class SafetyExtractionService:
     def _build_result_from_extraction(
         report_id: str,
         extraction: SafetyFactsExtractionResponse,
-        sa: SafetyAnalysis,
+        sa: Any,
         evidence_items: List[Evidence],
     ) -> AnalysisResultResponse:
         """Build AnalysisResultResponse directly from fresh extraction output."""

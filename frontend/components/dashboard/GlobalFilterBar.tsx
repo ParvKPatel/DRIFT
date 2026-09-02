@@ -53,12 +53,12 @@ export const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({
     filters.barrier_condition !== '';
 
   return (
-    <div className="p-3.5 bg-industrial-950/80 border border-industrial-800 rounded space-y-3">
+    <div className="p-3.5 bg-transparent border border-industrial-800 rounded-sm space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-xs font-mono font-bold text-industrial-200">
-          <Filter className="w-3.5 h-3.5 text-blue-400" />
+        <div className="flex items-center gap-2 text-xs font-sans font-bold text-industrial-500">
+          <Filter className="w-3.5 h-3.5" />
           <span>HSE INTELLIGENCE FILTERS</span>
-          {loading && <RefreshCw className="w-3 h-3 text-blue-400 animate-spin ml-2" />}
+          {loading && <RefreshCw className="w-3 h-3 animate-spin ml-2" />}
         </div>
 
         {hasActiveFilters && (
@@ -75,14 +75,14 @@ export const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5">
         {/* Time Window */}
         <div className="space-y-1">
-          <label className="text-[9px] font-mono uppercase text-industrial-400 block flex items-center gap-1">
-            <Calendar className="w-2.5 h-2.5 text-industrial-500" />
+          <label className="text-[9px] font-sans font-bold uppercase text-industrial-500 block flex items-center gap-1">
+            <Calendar className="w-2.5 h-2.5" />
             Time Window
           </label>
           <select
             value={filters.window}
             onChange={(e) => handleChange('window', e.target.value)}
-            className="w-full bg-industrial-900 border border-industrial-700 rounded px-2 py-1 text-xs font-mono text-industrial-200 focus:outline-none focus:border-blue-500"
+            className="w-full bg-white border border-industrial-800 rounded-sm px-2 py-1 text-xs font-sans text-industrial-100 focus:outline-none focus:border-industrial-400"
           >
             <option value="7d">Last 7 Days</option>
             <option value="30d">Last 30 Days</option>
@@ -93,14 +93,14 @@ export const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({
 
         {/* Site Filter */}
         <div className="space-y-1">
-          <label className="text-[9px] font-mono uppercase text-industrial-400 block flex items-center gap-1">
-            <MapPin className="w-2.5 h-2.5 text-industrial-500" />
+          <label className="text-[9px] font-sans font-bold uppercase text-industrial-500 block flex items-center gap-1">
+            <MapPin className="w-2.5 h-2.5" />
             Operational Site
           </label>
           <select
             value={filters.site}
             onChange={(e) => handleChange('site', e.target.value)}
-            className="w-full bg-industrial-900 border border-industrial-700 rounded px-2 py-1 text-xs font-mono text-industrial-200 focus:outline-none focus:border-blue-500"
+            className="w-full bg-white border border-industrial-800 rounded-sm px-2 py-1 text-xs font-sans text-industrial-100 focus:outline-none focus:border-industrial-400"
           >
             <option value="">All Sites</option>
             <option value="Offshore Platform Alpha">Offshore Platform Alpha</option>
@@ -111,13 +111,13 @@ export const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({
 
         {/* SIF Status Filter */}
         <div className="space-y-1">
-          <label className="text-[9px] font-mono uppercase text-industrial-400 block">
+          <label className="text-[9px] font-sans font-bold uppercase text-industrial-500 block">
             SIF / FPI Status
           </label>
           <select
             value={filters.sif_status}
             onChange={(e) => handleChange('sif_status', e.target.value)}
-            className="w-full bg-industrial-900 border border-industrial-700 rounded px-2 py-1 text-xs font-mono text-industrial-200 focus:outline-none focus:border-blue-500"
+            className="w-full bg-white border border-industrial-800 rounded-sm px-2 py-1 text-xs font-sans text-industrial-100 focus:outline-none focus:border-industrial-400"
           >
             <option value="">All Decisions</option>
             <option value="YES">SIF Precursor (YES)</option>
@@ -128,14 +128,14 @@ export const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({
 
         {/* Life-Saving Rule */}
         <div className="space-y-1">
-          <label className="text-[9px] font-mono uppercase text-industrial-400 block flex items-center gap-1">
-            <Shield className="w-2.5 h-2.5 text-industrial-500" />
+          <label className="text-[9px] font-sans font-bold uppercase text-industrial-500 block flex items-center gap-1">
+            <Shield className="w-2.5 h-2.5" />
             Life-Saving Rule
           </label>
           <select
             value={filters.lsr}
             onChange={(e) => handleChange('lsr', e.target.value)}
-            className="w-full bg-industrial-900 border border-industrial-700 rounded px-2 py-1 text-xs font-mono text-industrial-200 focus:outline-none focus:border-blue-500"
+            className="w-full bg-white border border-industrial-800 rounded-sm px-2 py-1 text-xs font-sans text-industrial-100 focus:outline-none focus:border-industrial-400"
           >
             <option value="">All 9 Rules</option>
             {OFFICIAL_LSR_OPTIONS.map((rule) => (
@@ -148,13 +148,13 @@ export const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({
 
         {/* HSE Priority Level */}
         <div className="space-y-1">
-          <label className="text-[9px] font-mono uppercase text-industrial-400 block">
+          <label className="text-[9px] font-sans font-bold uppercase text-industrial-500 block">
             Priority Level
           </label>
           <select
             value={filters.priority_level}
             onChange={(e) => handleChange('priority_level', e.target.value)}
-            className="w-full bg-industrial-900 border border-industrial-700 rounded px-2 py-1 text-xs font-mono text-industrial-200 focus:outline-none focus:border-blue-500"
+            className="w-full bg-white border border-industrial-800 rounded-sm px-2 py-1 text-xs font-sans text-industrial-100 focus:outline-none focus:border-industrial-400"
           >
             <option value="">All Priorities</option>
             <option value="CRITICAL">Critical Override</option>
@@ -167,13 +167,13 @@ export const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({
 
         {/* Barrier Condition */}
         <div className="space-y-1">
-          <label className="text-[9px] font-mono uppercase text-industrial-400 block">
+          <label className="text-[9px] font-sans font-bold uppercase text-industrial-500 block">
             Barrier State
           </label>
           <select
             value={filters.barrier_condition}
             onChange={(e) => handleChange('barrier_condition', e.target.value)}
-            className="w-full bg-industrial-900 border border-industrial-700 rounded px-2 py-1 text-xs font-mono text-industrial-200 focus:outline-none focus:border-blue-500"
+            className="w-full bg-white border border-industrial-800 rounded-sm px-2 py-1 text-xs font-sans text-industrial-100 focus:outline-none focus:border-industrial-400"
           >
             <option value="">All Barrier States</option>
             <option value="FAILED">Failed</option>

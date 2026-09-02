@@ -14,15 +14,15 @@ export const ConfidenceBadge: React.FC<ConfidenceBadgeProps> = ({ confidence, cl
   const pct = Math.round(confidence * 100);
 
   const getStyle = (val: number) => {
-    if (val >= 85) return 'text-emerald-400 bg-emerald-950/40 border-emerald-800/40';
-    if (val >= 60) return 'text-amber-400 bg-amber-950/40 border-amber-800/40';
-    return 'text-slate-400 bg-slate-900 border-slate-700';
+    if (val >= 85) return 'text-black bg-industrial-900 border-industrial-800';
+    if (val >= 60) return 'text-industrial-500 bg-industrial-900 border-industrial-800';
+    return 'text-industrial-400 bg-white border-industrial-800';
   };
 
   return (
     <span
       className={cn(
-        'inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono border',
+        'inline-flex items-center px-2 py-0.5 rounded text-[11px] font-sans border',
         getStyle(pct),
         className
       )}

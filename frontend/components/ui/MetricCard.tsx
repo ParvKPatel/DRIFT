@@ -16,37 +16,21 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   value = '—',
   subtitle,
   icon: Icon,
-  variant = 'default',
   className,
 }) => {
-  const getBorderColor = () => {
-    switch (variant) {
-      case 'critical':
-        return 'border-red-900/60 bg-red-950/20';
-      case 'warning':
-        return 'border-amber-900/60 bg-amber-950/20';
-      case 'success':
-        return 'border-emerald-900/60 bg-emerald-950/20';
-      case 'info':
-        return 'border-blue-900/60 bg-blue-950/20';
-      default:
-        return 'border-industrial-700 bg-industrial-900';
-    }
-  };
-
   return (
-    <div className={cn('p-4 rounded border transition-all', getBorderColor(), className)}>
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-mono tracking-wider uppercase text-industrial-300">
+    <div className={cn('p-4 flex flex-col', className)}>
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-[10px] font-sans font-bold tracking-wider uppercase text-industrial-500">
           {title}
         </span>
         {Icon && <Icon className="w-4 h-4 text-industrial-400" />}
       </div>
-      <div className="mt-2 text-2xl font-mono font-bold tracking-tight text-industrial-100">
+      <div className="text-3xl font-sans font-bold tracking-tight text-industrial-100">
         {value}
       </div>
       {subtitle && (
-        <div className="mt-1 text-xs text-industrial-400 font-mono">
+        <div className="mt-1 text-xs text-industrial-500 font-sans">
           {subtitle}
         </div>
       )}

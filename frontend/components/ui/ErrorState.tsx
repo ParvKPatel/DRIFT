@@ -13,18 +13,18 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
   onRetry,
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center p-8 text-center border border-red-900/60 rounded bg-red-950/20">
-      <AlertTriangle className="w-8 h-8 text-red-400 mb-2" />
-      <h4 className="text-sm font-mono font-semibold text-red-300 uppercase tracking-wide">
+    <div className="flex flex-col items-center justify-center p-8 text-center border border-industrial-800 rounded-sm bg-transparent">
+      <AlertTriangle className="w-8 h-8 text-black mb-2" />
+      <h4 className="text-sm font-sans font-bold text-black uppercase tracking-wide">
         {title}
       </h4>
-      <p className="text-xs text-red-400 max-w-md mt-1 mb-4 font-mono">
+      <p className="text-xs text-industrial-500 max-w-md mt-1 mb-4 font-sans">
         {message}
       </p>
       {onRetry && (
         <button
           onClick={onRetry}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded text-xs font-mono bg-red-900/40 hover:bg-red-900/60 text-red-200 border border-red-800 transition-colors"
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm text-xs font-sans bg-white hover:bg-industrial-900 text-black border border-industrial-800 transition-colors"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           Retry Connection
