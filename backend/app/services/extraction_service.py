@@ -26,6 +26,9 @@ from sqlalchemy import select
 from app.models.reports import Report
 from app.models.safety_analysis import SafetyAnalysis
 from app.models.evidence import Evidence
+from app.services.sif_rule_engine import SafetyRuleEngine
+from app.services.review_service import ReviewService
+from app.utils.logging import logger
 from app.schemas.enums import AnalysisStatus, EvidenceStatus, BarrierCondition, EnergySource
 from app.schemas.safety_extraction import (
     SafetyFactsExtractionResponse,
@@ -108,12 +111,21 @@ class SafetyExtractionService:
                 f"model={provider.MODEL_NAME} for report={report_id}"
             )
 
+            # 4b. Fetch any human reviews to feed into AI context
+            review = await ReviewService.get_latest_review(report_id, db)
+            human_feedback = review.reviewer_comment if review and review.reviewer_comment else ""
+            human_decision = ""
+            if review and review.review_decision:
+                human_decision = getattr(review.review_decision, "value", str(review.review_decision))
+
             # 5. Build context metadata for the provider prompt
             context: Dict[str, Any] = {
                 "report_id": report_id,
                 "incident_cause": report.incident_cause or "",
                 "fixed_short_description": report.fixed_short_description or "",
                 "corrective_action": report.corrective_action or "",
+                "human_feedback": human_feedback,
+                "human_decision": human_decision,
             }
 
             # 6. Call provider

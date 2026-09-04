@@ -61,6 +61,25 @@ class MockSafetyExtractionProvider(SafetyExtractionProvider):
         # ── POTENTIAL CONSEQUENCE ────────────────────────────────────────────
         pc_value, pc_ev, pc_status, pc_conf = self._extract_consequence(text, narrative)
 
+        # ── HUMAN OVERRIDE LOGIC (For Demo Purposes) ─────────────────────────
+        human_decision = str(ctx.get("human_decision", "")).upper()
+        human_feedback = str(ctx.get("human_feedback", "")).lower()
+
+        if "OVERRIDE" in human_decision:
+            if "not critical" in human_feedback or "low" in human_feedback or "safe" in human_feedback:
+                hazard_value = "Routine/Low-Risk Task (Human Overridden)"
+                pc_value = "Minor first aid or no injury"
+                bc_value = BarrierCondition.INTACT
+                energy_value = None
+                exposure_value = "none"
+                loc_value = "none"
+            elif "critical" in human_feedback or "high" in human_feedback or "fatal" in human_feedback:
+                hazard_value = "Critical Life-Threatening Hazard (Human Overridden)"
+                pc_value = "Fatality or severe permanent disability"
+                bc_value = BarrierCondition.FAILED
+                exposure_value = "Personnel directly in line of fire"
+                loc_value = "Direct trajectory"
+
         def _make_fact(value, evidence, status, conf):
             start, end = self._find_offsets(narrative, evidence)
             return FactField(
