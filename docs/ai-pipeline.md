@@ -1,6 +1,6 @@
 # AI Safety Intelligence Pipeline
 
-OIL SENTINEL combines NLP extraction, deterministic safety rules, vector embeddings, and temporal clustering into a hybrid intelligence pipeline.
+DRIFT combines NLP extraction, deterministic safety rules, vector embeddings, and temporal clustering into a hybrid intelligence pipeline.
 
 ## Processing Pipeline Flow
 

@@ -1,7 +1,7 @@
 """
 Phase 7 — Dashboard Schemas
 
-Pydantic schemas for the OIL SENTINEL Intelligence Dashboard:
+Pydantic schemas for the DRIFT Intelligence Dashboard:
 - Executive Summary & Comparison
 - Trend Points
 - Site & Functional Location Intelligence (Density vs Concentration)

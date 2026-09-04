@@ -1,5 +1,5 @@
 """
-AI Provider Factory for OIL SENTINEL
+AI Provider Factory for DRIFT
 
 Reads settings.AI_PROVIDER and settings.AI_API_KEY to select the
 appropriate AI provider. Falls back to MockSafetyExtractionProvider

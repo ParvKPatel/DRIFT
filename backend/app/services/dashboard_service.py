@@ -1,7 +1,7 @@
 """
 Phase 7 — Dashboard Service
 
-Provides real, database-derived aggregations for the OIL SENTINEL Intelligence Dashboard:
+Provides real, database-derived aggregations for the DRIFT Intelligence Dashboard:
 - Executive Summary & Comparison
 - Trend Points (7d, 30d, 90d, 12m)
 - Site & Functional Location Intelligence (with normalized density or concentration fallback)

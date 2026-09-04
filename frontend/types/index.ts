@@ -253,6 +253,9 @@ export interface SafetyAnalysisResult {
   potential_consequence_evidence_status?: EvidenceStatus;
   potential_consequence_confidence?: number;
 
+  suggested_actions?: string;
+  suggested_actions_reasoning?: string;
+
   evidence_items: EvidenceItem[];
 }
 

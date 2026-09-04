@@ -29,3 +29,10 @@ class IngestionResultResponse(BaseModel):
     warnings: List[RowValidationError] = []
     field_completeness: Dict[str, FieldQualityStats] = {}
     message: str
+
+
+class AnalysisProgress(BaseModel):
+    filename: str
+    total_imported: int
+    total_analyzed: int
+    status: str  # "PENDING", "PROCESSING", "COMPLETED"

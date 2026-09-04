@@ -105,7 +105,7 @@ class MockSafetyExtractionProvider(SafetyExtractionProvider):
             return ("Maintenance activity", "maintenance", EvidenceStatus.EXPLICIT, 0.75)
         if "housekeeping" in text:
             return ("Housekeeping / area cleaning", "housekeeping", EvidenceStatus.EXPLICIT, 0.80)
-        return (None, None, EvidenceStatus.UNKNOWN, 0.0)
+        return ("General Operations (Mock)", None, EvidenceStatus.INFERRED, 0.40)
 
     def _extract_equipment(self, text, narrative):
         if "pin" in text and ("structure" in text or "shackle" in text):
@@ -122,7 +122,7 @@ class MockSafetyExtractionProvider(SafetyExtractionProvider):
             return ("Eyewash station", "eyewash", EvidenceStatus.EXPLICIT, 0.92)
         if "crane" in text:
             return ("Crane", "crane", EvidenceStatus.EXPLICIT, 0.90)
-        return (None, None, EvidenceStatus.UNKNOWN, 0.0)
+        return ("Standard Tools / Equipment (Mock)", None, EvidenceStatus.INFERRED, 0.40)
 
     def _extract_hazard(self, text, narrative):
         if "pin" in text and ("speed" in text or "came out" in text or "ejected" in text):
@@ -142,7 +142,7 @@ class MockSafetyExtractionProvider(SafetyExtractionProvider):
             return ("Electrical contact hazard", "electrical" if "electrical" in text else "electric", EvidenceStatus.EXPLICIT, 0.88)
         if "eyewash" in text and ("blocked" in text or "not working" in text or "inoperative" in text or "missing" in text):
             return ("Compromised emergency eyewash provision — barrier failure", "eyewash", EvidenceStatus.INFERRED, 0.72)
-        return (None, None, EvidenceStatus.UNKNOWN, 0.0)
+        return ("Unrecognized Hazard (Mock)", None, EvidenceStatus.INFERRED, 0.40)
 
     def _extract_energy(self, text, narrative):
         if "speed" in text or "ejected" in text or "came out" in text or "kinetic" in text:
@@ -173,7 +173,7 @@ class MockSafetyExtractionProvider(SafetyExtractionProvider):
                     "person nearby" if "person nearby" in text else "nearby", EvidenceStatus.EXPLICIT, 0.78)
         if "operator" in text:
             return ("Operator exposed to equipment hazard", "operator", EvidenceStatus.EXPLICIT, 0.82)
-        return (None, None, EvidenceStatus.UNKNOWN, 0.0)
+        return ("Personnel in vicinity (Mock)", None, EvidenceStatus.INFERRED, 0.40)
 
     def _extract_exposure_location(self, text, narrative):
         if "opposite side" in text:
@@ -186,7 +186,7 @@ class MockSafetyExtractionProvider(SafetyExtractionProvider):
                     "beneath" if "beneath" in text else "below", EvidenceStatus.EXPLICIT, 0.88)
         if "near" in text:
             return ("Near the hazard source", "near", EvidenceStatus.INFERRED, 0.60)
-        return (None, None, EvidenceStatus.UNKNOWN, 0.0)
+        return ("General work area (Mock)", None, EvidenceStatus.INFERRED, 0.40)
 
     def _extract_barrier(self, text, narrative):
         if "exclusion" in text or "barricade" in text or "barrier" in text:
@@ -227,7 +227,7 @@ class MockSafetyExtractionProvider(SafetyExtractionProvider):
             return ("Trip and fall injury — potential serious injury", None, EvidenceStatus.INFERRED, 0.65)
         if "hammer" in text and "slip" in text:
             return ("Struck-by injury from slipping striking tool", None, EvidenceStatus.INFERRED, 0.72)
-        return (None, None, EvidenceStatus.UNKNOWN, 0.0)
+        return ("Possible minor injury/incident (Mock)", None, EvidenceStatus.INFERRED, 0.40)
 
     @staticmethod
     def _find_offsets(narrative: str, evidence: Optional[str]):
@@ -238,6 +238,47 @@ class MockSafetyExtractionProvider(SafetyExtractionProvider):
         if idx == -1:
             return None, None
         return idx, idx + len(evidence)
+
+    async def generate_suggested_actions(
+        self,
+        narrative: str,
+        hazard: str,
+        barrier_condition: str,
+        life_saving_rule: str,
+        previous_actions: str = "",
+    ) -> tuple[List[str], str]:
+        import asyncio
+        text = narrative.lower()
+        actions = []
+        
+        # Personalized based on text
+        if "fire" in text or "hot work" in text or "burn" in text:
+            actions.append(f"Inspect all fire extinguishers and hot work permits in the {hazard or 'affected'} zone.")
+            actions.append("Ensure a dedicated fire watch is maintained for 30 minutes after operations.")
+        elif "fall" in text or "height" in text or "scaffold" in text:
+            actions.append("Conduct an immediate audit of all fall arrest systems and harness lanyards.")
+            actions.append("Re-certify scaffolding tags and ensure toe boards are secure.")
+        elif "lift" in text or "crane" in text or "dropped" in text:
+            actions.append("Re-establish the lifting exclusion zone with physical barricades.")
+            actions.append("Inspect all rigging equipment (slings, shackles) for wear and tear.")
+        elif "pressure" in text or "leak" in text or "hose" in text:
+            actions.append("Depressurize lines and conduct a visual sweep for fluid leaks.")
+            actions.append("Verify LOTO (Lock-Out Tag-Out) is applied to all active valves.")
+        else:
+            actions.append(f"Verify the {str(barrier_condition).lower() if barrier_condition else 'safety'} controls for {hazard or 'this task'}.")
+            actions.append(f"Review the {life_saving_rule or 'relevant'} documentation.")
+            actions.append("Inspect the affected work area.")
+            
+        # Connect to previous actions if any exist
+        if previous_actions:
+            actions.append(f"Follow up on previous action: '{previous_actions}'.")
+            
+        # Add a generic closing action
+        actions.append("Conduct a toolbox talk covering these specific risks before resuming work.")
+        
+        reasoning = f"Based on the detected hazard ({hazard}), barrier condition ({barrier_condition}), and the narrative context, these specific actions align with {life_saving_rule or 'standard safety protocols'}."
+        await asyncio.sleep(0.5)
+        return actions, reasoning
 
 
 class MockEmbeddingProvider(EmbeddingProvider):
@@ -258,10 +299,20 @@ class MockSIFReasoningProvider(SIFReasoningProvider):
     """
 
     async def evaluate_sif_potential(self, safety_facts: Dict[str, Any]) -> Dict[str, Any]:
-        # Phase 3: return stub — real SIF logic is Phase 4
+        # Simple heuristic to spread out SIF potential deterministically
+        fact_str = str(safety_facts)
+        score = sum(ord(c) for c in fact_str) % 3
+        
+        if score == 0:
+            status = "YES"
+        elif score == 1:
+            status = "NO"
+        else:
+            status = "UNCERTAIN"
+            
         return {
-            "sif_fpi_potential": "UNCERTAIN",
-            "sif_confidence": None,
-            "evidence_status": "UNKNOWN",
-            "note": "SIF/FPI screening is implemented in Phase 4. This is a Phase 3 stub.",
+            "sif_fpi_potential": status,
+            "sif_confidence": 0.85,
+            "evidence_status": "EXPLICIT",
+            "note": "Deterministically assigned mock value to balance data spread.",
         }

@@ -25,7 +25,7 @@ from app.utils.logging import logger
 
 
 class IntelligenceService:
-    """Unified pipeline orchestrator for OIL SENTINEL Report Intelligence."""
+    """Unified pipeline orchestrator for DRIFT Report Intelligence."""
 
     @classmethod
     async def process_full_intelligence(

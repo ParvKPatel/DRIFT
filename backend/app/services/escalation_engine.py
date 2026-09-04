@@ -14,7 +14,7 @@ CRITICAL MANDATES:
 """
 
 import math
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict, Any, Optional, Tuple, Sequence
 from datetime import datetime, timezone, date
 
 from app.config import settings
@@ -30,7 +30,7 @@ class EscalationEngine:
     @classmethod
     def calculate_cluster_escalation(
         cls,
-        member_reports: List[Tuple[Report, Optional[SafetyAnalysis], float]],
+        member_reports: Sequence[Tuple[Report, Optional[SafetyAnalysis], float]],
         now: Optional[datetime] = None,
     ) -> Tuple[float, EscalationBand, List[str], Dict[str, Any]]:
         """

@@ -665,10 +665,11 @@ async def seed_synthetic_reports(db: AsyncSession) -> int:
 
     seeded_count = 0
     for data in SYNTHETIC_DEMO_REPORTS:
-        if data["report_id"] not in existing_ids:
+        report_id = str(data["report_id"])
+        if report_id not in existing_ids:
             report_obj = Report(**data)
             db.add(report_obj)
-            existing_ids.add(data["report_id"])
+            existing_ids.add(report_id)
             seeded_count += 1
 
     if seeded_count > 0:

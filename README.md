@@ -1,8 +1,8 @@
-# OIL SENTINEL — Serious Injury & Fatality (SIF) Precursor Engine
+# DRIFT — Serious Injury & Fatality (SIF) Precursor Engine
 
 > **Phase 9 Status**: Completed — Testing, Evaluation & Robustness, Reproducible Evaluation Runner CLI, Confusion Matrix, Critical Misses & Abstention Metrics, Data Leakage Audit, and Database-Driven Evaluation Dashboard.
 
-OIL SENTINEL is a specialized decision-support engine engineered to process unstructured industrial safety reports and identify precursor patterns indicating high potential for Serious Injury or Fatality (SIF).
+DRIFT is a specialized decision-support engine engineered to process unstructured industrial safety reports and identify precursor patterns indicating high potential for Serious Injury or Fatality (SIF).
 
 ---
 

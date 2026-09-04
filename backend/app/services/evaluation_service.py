@@ -168,7 +168,7 @@ class EvaluationService:
             id=1,
             dataset_name="Synthetic Demo Reference Dataset",
             dataset_version="v1.0-synthetic",
-            pipeline_version="oil-sentinel-v1",
+            pipeline_version="drift-v1",
             sample_count=sample_count,
             precision=round(precision, 4),
             recall=round(recall, 4),

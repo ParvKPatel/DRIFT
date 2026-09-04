@@ -22,7 +22,7 @@ class JSONFormatter(logging.Formatter):
 
 
 def setup_logging():
-    logger = logging.getLogger("oil_sentinel")
+    logger = logging.getLogger("drift")
     logger.setLevel(getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO))
     
     if not logger.handlers:

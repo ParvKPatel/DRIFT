@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { AppShell } from '@/components/layout/AppShell';
-import { SectionCard } from '@/components/ui/SectionCard';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { DataTable, Column } from '@/components/ui/DataTable';
-import { SourceReport, PriorityLevel } from '@/types';
-import { AlertTriangle, ShieldAlert, RefreshCw, Sparkles } from 'lucide-react';
+import { PriorityBadge } from '@/components/ui/PriorityBadge';
+import { StatusBadge } from '@/components/ui/StatusBadge';
+import { SourceReport } from '@/types';
+import { RefreshCw, Sparkles, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
 export default function PriorityQueuePage() {
@@ -18,11 +18,10 @@ export default function PriorityQueuePage() {
   const fetchPriorityQueue = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/v1/reports?size=50');
+      const res = await fetch('/api/v1/reports?size=100');
       if (res.ok) {
         const data = await res.json();
         const items: SourceReport[] = data.items || [];
-        // Sort items by priority_score descending
         items.sort((a, b) => (b.priority_score || 0) - (a.priority_score || 0));
         setReports(items);
       }
@@ -65,129 +64,113 @@ export default function PriorityQueuePage() {
     return true;
   });
 
-  const columns: Column<SourceReport>[] = [
-    {
-      header: 'Score',
-      accessor: (r) => (
-        <span className="p-1.5 bg-industrial-950 border border-industrial-700 rounded text-xs font-mono font-bold text-industrial-100 block text-center min-w-[45px]">
-          {r.priority_score !== undefined && r.priority_score !== null ? r.priority_score : '—'}
-        </span>
-      ),
-    },
-    {
-      header: 'Priority Level',
-      accessor: (r) => {
-        const lvl = r.priority_level;
-        if (!lvl) return <span className="text-industrial-500 text-[10px] font-mono">UNCLASSIFIED</span>;
-
-        const map: Record<string, string> = {
-          CRITICAL: 'bg-red-950/90 text-red-300 border-red-700 font-bold animate-pulse',
-          HIGH_PRIORITY_SIF_FPI_PRECURSOR: 'bg-orange-950/90 text-orange-300 border-orange-700 font-bold',
-          SAFETY_REVIEW: 'bg-amber-950/90 text-amber-300 border-amber-700 font-semibold',
-          ROUTINE: 'bg-emerald-950/90 text-emerald-300 border-emerald-800',
-          UNCERTAIN: 'bg-industrial-900 text-industrial-400 border-industrial-700',
-        };
-        const cls = map[lvl] || map.UNCERTAIN;
-        return (
-          <span className={`px-2.5 py-1 rounded text-xs font-mono uppercase border ${cls}`}>
-            {lvl.replace('_PRECURSOR', '')}
-          </span>
-        );
-      },
-    },
-    {
-      header: 'Report ID',
-      accessor: (r) => (
-        <Link href={`/reports/${r.report_id}`} className="font-mono font-semibold text-blue-400 hover:underline">
-          {r.report_id}
-        </Link>
-      ),
-    },
-    { header: 'Site', accessor: (r) => r.site || '—' },
-    { header: 'Location', accessor: (r) => r.functional_location || '—' },
-    {
-      header: 'SIF Potential',
-      accessor: (r) => {
-        const val = r.sif_fpi_potential;
-        if (val === 'YES') {
-          return <span className="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-red-950 text-red-300 border border-red-800">YES</span>;
-        }
-        if (val === 'UNCERTAIN') {
-          return <span className="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-amber-950 text-amber-300 border border-amber-800">UNCERTAIN</span>;
-        }
-        return <span className="px-2 py-0.5 rounded text-[9px] font-mono text-emerald-400">NO</span>;
-      },
-    },
-    {
-      header: 'Life-Saving Rule',
-      accessor: (r) => (
-        <span className="font-mono text-purple-300 text-xs">
-          {r.primary_life_saving_rule || '—'}
-        </span>
-      ),
-    },
-    {
-      header: 'Action Needed',
-      accessor: (r) => (
-        <Link
-          href={`/reports/${r.report_id}`}
-          className="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white font-mono text-[10px] uppercase font-semibold transition-colors inline-block"
-        >
-          Inspect Triage
-        </Link>
-      ),
-    },
-  ];
+  const criticalCount = reports.filter((r) => r.priority_level === 'CRITICAL').length;
+  const highCount = reports.filter((r) => r.priority_level === 'HIGH_PRIORITY_SIF_FPI_PRECURSOR').length;
+  const reviewCount = reports.filter((r) => r.priority_level === 'SAFETY_REVIEW').length;
+  const totalCount = reports.length;
 
   return (
-    <AppShell title="HSE Priority Queue">
-      <SectionCard
-        title="High-Priority Precursor Risk Queue"
-        subtitle="Database-derived HSE incident rankings based on SIF screening, barrier condition, and safety rule overrides."
-        action={
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleBatchCalculate}
-              disabled={calculating}
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-industrial-800 hover:bg-industrial-700 text-industrial-200 border border-industrial-600 font-mono text-xs font-semibold uppercase tracking-wider transition-colors disabled:opacity-50"
-            >
-              {calculating ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 text-blue-400" />}
-              Recalculate Priority Queue
-            </button>
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs font-mono text-industrial-400">Filter Level:</span>
-              <select
-                value={filterLevel}
-                onChange={(e) => setFilterLevel(e.target.value)}
-                className="bg-industrial-950 border border-industrial-700 rounded px-2.5 py-1 text-xs font-mono text-industrial-200 focus:outline-none focus:border-blue-500"
-              >
-                <option value="ALL">All Priority Levels</option>
-                <option value="CRITICAL">Critical Only</option>
-                <option value="HIGH">High Priority SIF Only</option>
-                <option value="REVIEW">Safety Review Only</option>
-                <option value="ROUTINE">Routine Only</option>
-                <option value="UNCERTAIN">Uncertain Only</option>
-              </select>
-            </div>
+    <AppShell title="Priority Queue">
+      <div className="max-w-5xl mx-auto space-y-8 pb-12">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-industrial-850 pb-6">
+          <div>
+            <h1 className="text-2xl font-semibold text-industrial-100">Attention Required</h1>
+            <p className="text-[13px] text-industrial-500 mt-1">Review cases prioritized by risk level.</p>
           </div>
-        }
-      >
-        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+          </div>
+        </div>
+
+        {/* Priority Summary Blocks */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="p-4 bg-industrial-950 border border-industrial-850 rounded">
+            <div className="text-[11px] uppercase text-industrial-500 mb-1">Critical</div>
+            <div className="text-3xl font-semibold text-red-500">{criticalCount}</div>
+          </div>
+          <div className="p-4 bg-industrial-950 border border-industrial-850 rounded">
+            <div className="text-[11px] uppercase text-industrial-500 mb-1">High</div>
+            <div className="text-3xl font-semibold text-amber-500">{highCount}</div>
+          </div>
+          <div className="p-4 bg-industrial-950 border border-industrial-850 rounded">
+            <div className="text-[11px] uppercase text-industrial-500 mb-1">Review</div>
+            <div className="text-3xl font-semibold text-yellow-500">{reviewCount}</div>
+          </div>
+          <div className="p-4 bg-industrial-950 border border-industrial-850 rounded">
+            <div className="text-[11px] uppercase text-industrial-500 mb-1">Total Queue</div>
+            <div className="text-3xl font-semibold text-industrial-200">{totalCount}</div>
+          </div>
+        </div>
+
+        {/* Priority Table */}
+        <div className="bg-industrial-950 border border-industrial-850 rounded p-5">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-[13px] font-semibold text-industrial-200">Current Queue</h2>
+            <select
+              value={filterLevel}
+              onChange={(e) => setFilterLevel(e.target.value)}
+              className="bg-industrial-900 border border-industrial-800 rounded px-2.5 py-1.5 text-[12px] font-medium text-industrial-300 focus:outline-none focus:border-blue-500"
+            >
+              <option value="ALL">All Levels</option>
+              <option value="CRITICAL">Critical</option>
+              <option value="HIGH">High</option>
+              <option value="REVIEW">Review</option>
+              <option value="ROUTINE">Routine</option>
+            </select>
+          </div>
+
           {loading ? (
-            <div className="p-8 text-center font-mono text-xs text-industrial-400 flex items-center justify-center gap-2">
-              <RefreshCw className="w-4 h-4 animate-spin text-blue-400" />
-              Loading database HSE priority rankings...
-            </div>
+             <div className="py-12 text-center text-[12px] text-industrial-500 flex items-center justify-center gap-2">
+               <RefreshCw className="w-4 h-4 animate-spin text-blue-500" />
+               Loading queue...
+             </div>
           ) : filteredReports.length === 0 ? (
-            <EmptyState
-              title="Priority Queue Empty"
-              description="No reports match the selected priority filter criteria in the database."
-            />
+            <EmptyState title="Queue Empty" description="No reports match the current filter." />
           ) : (
-            <DataTable columns={columns} data={filteredReports} />
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="border-b border-industrial-850">
+                    <th className="pb-3 text-[11px] font-medium uppercase tracking-wider text-industrial-600 pr-4">Priority</th>
+                    <th className="pb-3 text-[11px] font-medium uppercase tracking-wider text-industrial-600 pr-4">Score</th>
+                    <th className="pb-3 text-[11px] font-medium uppercase tracking-wider text-industrial-600 pr-4">Report</th>
+                    <th className="pb-3 text-[11px] font-medium uppercase tracking-wider text-industrial-600 pr-4">Site</th>
+                    <th className="pb-3 text-[11px] font-medium uppercase tracking-wider text-industrial-600 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredReports.map((r) => (
+                    <tr key={r.report_id} className="border-b border-industrial-900 last:border-b-0 hover:bg-industrial-900/40 transition-colors">
+                      <td className="py-3 pr-4">
+                        <PriorityBadge level={r.priority_level} />
+                      </td>
+                      <td className="py-3 pr-4 text-[13px] font-semibold text-industrial-300">
+                        {r.priority_score ?? '—'}
+                      </td>
+                      <td className="py-3 pr-4">
+                        <Link href={`/reports/${r.report_id}`} className="text-[13px] font-medium text-industrial-200 hover:text-industrial-100 transition-colors block">
+                          {r.report_id}
+                        </Link>
+                        <span className="text-[12px] text-industrial-500 truncate max-w-[200px] block">
+                          {r.fixed_short_description || r.narrative?.slice(0, 40)}
+                        </span>
+                      </td>
+                      <td className="py-3 pr-4 text-[13px] text-industrial-400">
+                        {r.site || '—'}
+                      </td>
+                      <td className="py-3 text-right">
+                        <Link href={`/reports/${r.report_id}`} className="text-[12px] font-medium text-blue-500 hover:text-blue-400 transition-colors">
+                          Review
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
-      </SectionCard>
+      </div>
     </AppShell>
   );
 }

@@ -1,5 +1,5 @@
 """
-AI Provider Base Interfaces for OIL SENTINEL
+AI Provider Base Interfaces for DRIFT
 
 Ensures pluggable AI providers (OpenAI, hosted LLM, local model, or Mock).
 Never hardcode provider logic into backend routes or core business services.
@@ -42,8 +42,22 @@ class SafetyExtractionProvider(ABC):
         Providers MUST NOT:
         - Determine SIF/FPI potential (that is Phase 4+)
         - Calculate risk priority scores
-        - Overwrite source fields
         - Write to the database
+        """
+        pass
+
+    @abstractmethod
+    async def generate_suggested_actions(
+        self,
+        narrative: str,
+        hazard: str,
+        barrier_condition: str,
+        life_saving_rule: str,
+        previous_actions: str = "",
+    ) -> tuple[List[str], str]:
+        """
+        Generates 3-5 specific, evidence-based suggested actions for the HSE professional.
+        Returns a tuple of (actions_list, reasoning_text).
         """
         pass
 

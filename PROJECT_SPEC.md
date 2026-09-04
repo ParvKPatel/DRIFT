@@ -1,4 +1,4 @@
-# PROJECT_SPEC.md — OIL SENTINEL
+# PROJECT_SPEC.md — DRIFT
 
 > **Authoritative Technical Specification & Product Requirements Document**
 
@@ -6,13 +6,13 @@
 
 **Project Title**: AI/NLP Engine to Detect Serious Injury & Fatality (SIF) Precursors in Unsafe-Act, Unsafe-Condition, Near-Miss and Incident Reports
 
-**System Name**: **OIL SENTINEL**
+**System Name**: **DRIFT**
 
 ### 1.1 Objective
-OIL SENTINEL is a specialized decision-support engine engineered to process unstructured industrial safety reports and identify precursor patterns indicating high potential for Serious Injury or Fatality (SIF).
+DRIFT is a specialized decision-support engine engineered to process unstructured industrial safety reports and identify precursor patterns indicating high potential for Serious Injury or Fatality (SIF).
 
 ### 1.2 The Core Differentiator: Precursor Accumulation
-A single safety report viewed in isolation may appear minor (e.g. "shackle pin came loose"). However, when multiple reports across time share the same energy source, activity, equipment, or degraded barrier mechanism, they reveal an **emerging precursor accumulation pattern**. OIL SENTINEL connects reports across time instead of analyzing each report in isolation.
+A single safety report viewed in isolation may appear minor (e.g. "shackle pin came loose"). However, when multiple reports across time share the same energy source, activity, equipment, or degraded barrier mechanism, they reveal an **emerging precursor accumulation pattern**. DRIFT connects reports across time instead of analyzing each report in isolation.
 
 ---
 
@@ -53,7 +53,7 @@ Human-in-the-Loop Review
 
 1. **Evidence First**: System never invents safety facts. Every AI safety fact is annotated as `EXPLICIT`, `INFERRED`, or `UNKNOWN`.
 2. **Preserve Source Data**: Raw source fields belong strictly to `reports` and are never overwritten by AI findings in `safety_analysis`.
-3. **Decision Support Only**: OIL SENTINEL prioritizes reports for human safety officers; it does not claim to "predict fatalities" or replace HSE personnel ("OIL SENTINEL is a decision-support screening system, not an autonomous safety authority").
+3. **Decision Support Only**: DRIFT prioritizes reports for human safety officers; it does not claim to "predict fatalities" or replace HSE personnel ("DRIFT is a decision-support screening system, not an autonomous safety authority").
 4. **Uncertainty is Valid**: Explicitly supports `YES`, `NO`, and `UNCERTAIN` classification without fake "probability of death" numbers.
 5. **Deterministic Safety Override**: Critical safety rules override weak AI extraction signals to avoid dangerous false negatives.
 6. **Source Label Leakage Prevention**: Screening reasons from extracted safety facts & narrative, NOT from raw category labels.
@@ -66,7 +66,7 @@ Human-in-the-Loop Review
 ```
 Phase 3 Safety Facts (Activity, Equipment, Hazard, Energy, Exposure, Barrier, Consequence)
         ↓
-Deterministic Safety Rule Engine (8 OIL SENTINEL Safety Rules)
+Deterministic Safety Rule Engine (8 DRIFT Safety Rules)
   + RULE-001: High-Energy Mechanism with Human Exposure (SIF-001)
   + RULE-002: Falling Object Exposure (SIF-007)
   + RULE-003: Unexpected Ejection / Movement in Trajectory (SIF-002)

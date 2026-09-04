@@ -20,4 +20,4 @@ def test_database_model_metadata():
 
 def test_database_url_configuration():
     assert settings.DATABASE_URL is not None
-    assert "oil_sentinel" in settings.DATABASE_URL
+    assert "drift" in settings.DATABASE_URL

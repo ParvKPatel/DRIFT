@@ -1,7 +1,7 @@
 .PHONY: help dev-backend dev-frontend db-up db-down test lint clean
 
 help:
-	@echo "OIL SENTINEL - Development Commands"
+	@echo "DRIFT - Development Commands"
 	@echo "-----------------------------------"
 	@echo "make db-up         - Start PostgreSQL with pgvector container"
 	@echo "make db-down       - Stop PostgreSQL container"

@@ -24,6 +24,8 @@ class SafetyAnalysisBase(BaseModel):
     novelty_score: Optional[float] = None
     review_required: bool = False
     review_reason: Optional[str] = None
+    suggested_actions: Optional[str] = None
+    suggested_actions_reasoning: Optional[str] = None
 
     # Calculated intelligence scores
     sif_evidence_score: Optional[float] = None

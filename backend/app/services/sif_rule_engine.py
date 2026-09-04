@@ -1,5 +1,5 @@
 """
-Phase 4 — OIL SENTINEL Deterministic SIF/FPI Safety Rule Engine
+Phase 4 — DRIFT Deterministic SIF/FPI Safety Rule Engine
 
 HYBRID ARCHITECTURE:
 Phase 3 AI Extraction → Structured Safety Facts → Deterministic Safety Rules + Signal Scoring → SIF/FPI Result
@@ -32,7 +32,7 @@ from app.schemas.sif_screening import (
 from app.utils.logging import logger
 
 
-# Standardized OIL SENTINEL Reason Codes
+# Standardized DRIFT Reason Codes
 REASON_CODES = {
     "SIF-001": "High-energy mechanism with human exposure",
     "SIF-002": "Person within hazardous trajectory",
@@ -53,7 +53,7 @@ REASON_CODES = {
 
 @dataclass
 class SafetyRule:
-    """Definition of a deterministic OIL SENTINEL safety screening rule."""
+    """Definition of a deterministic DRIFT safety screening rule."""
     rule_id: str
     name: str
     description: str
@@ -354,7 +354,7 @@ class Rule008CaughtInBetween(SafetyRule):
 
 class SafetyRuleEngine:
     """
-    OIL SENTINEL Deterministic Safety Rule Engine.
+    DRIFT Deterministic Safety Rule Engine.
 
     Evaluates 8 deterministic safety rules against Phase 3 safety facts.
     Calculates 5 transparent screening signals.
@@ -491,8 +491,8 @@ class SafetyRuleEngine:
             con_sig = 0.20
 
         # Evidence signal (0.0 - 1.0) based on confidence averages across 9 facts
-        conf_values = [
-            facts.get(f"{field}_confidence")
+        conf_values: list[float] = [
+            float(facts[f"{field}_confidence"])
             for field in ("activity", "equipment", "hazard", "energy_source", "exposure", "exposure_location", "barrier", "barrier_condition", "potential_consequence")
             if facts.get(f"{field}_confidence") is not None
         ]

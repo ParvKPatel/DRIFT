@@ -1,7 +1,7 @@
 """
 Phase 7 — Dashboard API Router
 
-Exposes real, database-driven endpoints for the OIL SENTINEL Intelligence Dashboard:
+Exposes real, database-driven endpoints for the DRIFT Intelligence Dashboard:
 - GET /dashboard/summary
 - GET /dashboard/trends
 - GET /dashboard/sites
@@ -192,5 +192,5 @@ async def export_table_csv(
     return StreamingResponse(
         iter([output.getvalue()]),
         media_type="text/csv",
-        headers={"Content-Disposition": f"attachment; filename=oil_sentinel_{table_name}_export.csv"}
+        headers={"Content-Disposition": f"attachment; filename=drift_{table_name}_export.csv"}
     )

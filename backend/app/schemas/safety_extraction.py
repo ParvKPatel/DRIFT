@@ -67,39 +67,39 @@ class SafetyFactsExtractionResponse(BaseModel):
     """
 
     activity: FactField[str] = Field(
-        default_factory=FactField,
+        default_factory=FactField[str],
         description="Task or work being performed at time of incident."
     )
     equipment: FactField[str] = Field(
-        default_factory=FactField,
+        default_factory=FactField[str],
         description="Equipment, tool, machine, or object involved."
     )
     hazard: FactField[str] = Field(
-        default_factory=FactField,
+        default_factory=FactField[str],
         description="The hazardous mechanism or condition (NOT the source incident_cause field)."
     )
     energy_source: FactField[EnergySource] = Field(
-        default_factory=FactField,
+        default_factory=FactField[EnergySource],
         description="The energy form capable of causing harm."
     )
     exposure: FactField[str] = Field(
-        default_factory=FactField,
+        default_factory=FactField[str],
         description="Who or what was exposed and how."
     )
     exposure_location: FactField[str] = Field(
-        default_factory=FactField,
+        default_factory=FactField[str],
         description="Where the exposed person/object was relative to the hazard."
     )
     barrier: FactField[str] = Field(
-        default_factory=FactField,
+        default_factory=FactField[str],
         description="The safety control that should prevent or mitigate the hazard."
     )
     barrier_condition: FactField[BarrierCondition] = Field(
-        default_factory=FactField,
+        default_factory=FactField[BarrierCondition],
         description="Condition of the barrier: INTACT, DEGRADED, FAILED, ABSENT, or UNKNOWN."
     )
     potential_consequence: FactField[str] = Field(
-        default_factory=FactField,
+        default_factory=FactField[str],
         description="What COULD happen if the hazard mechanism reaches the exposed person. NOT the actual outcome."
     )
 
@@ -213,6 +213,10 @@ class AnalysisResultResponse(BaseModel):
     potential_consequence_evidence: Optional[str] = None
     potential_consequence_evidence_status: Optional[EvidenceStatus] = None
     potential_consequence_confidence: Optional[float] = None
+
+    # Suggested Actions
+    suggested_actions: Optional[str] = None
+    suggested_actions_reasoning: Optional[str] = None
 
     # Evidence span items
     evidence_items: List[EvidenceItemResponse] = []

@@ -237,7 +237,10 @@ class ReviewService:
             Report.id.desc(),
         )
 
-        total_res = await db.execute(select(func.count(Report.id)).outerjoin(SafetyAnalysis, Report.report_id == SafetyAnalysis.report_id).where(and_(*filters) if filters else True))
+        count_stmt = select(func.count(Report.id)).outerjoin(SafetyAnalysis, Report.report_id == SafetyAnalysis.report_id)
+        if filters:
+            count_stmt = count_stmt.where(and_(*filters))
+        total_res = await db.execute(count_stmt)
         total = total_res.scalar_one() or 0
 
         res = await db.execute(query.offset(offset).limit(limit))

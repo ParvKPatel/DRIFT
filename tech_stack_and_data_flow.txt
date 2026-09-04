@@ -1,0 +1,86 @@
+# DRIFT: System Architecture, Tech Stack, & Data Flow
+
+This document details the exact technology stack, the models used, the end-to-end data flow, and the rationale behind the architectural choices in the DRIFT application.
+
+---
+
+## 1. Technology Stack
+
+### Frontend
+- **Framework**: Next.js (React)
+- **Language**: TypeScript / TSX
+- **Styling**: Tailwind CSS
+- **Components & Icons**: Custom UI components, Lucide React for iconography.
+- **Data Visualization**: Recharts for dashboard analytics.
+- **Why?**: Next.js provides a robust, fast, and scalable React environment. Tailwind CSS allows for rapid, consistent, and beautiful UI development.
+
+### Backend
+- **Framework**: FastAPI (Python)
+- **Language**: Python 3.10+
+- **ORM**: SQLAlchemy (Async)
+- **Why?**: FastAPI is incredibly fast, natively supports asynchronous processing (crucial for waiting on background AI tasks and database queries), and automatically generates API documentation.
+
+### Database
+- **Primary Database**: PostgreSQL
+- **Vector Extension**: `pgvector`
+- **Why?**: PostgreSQL is highly reliable for relational data (storing reports, analysis results, evidence). `pgvector` is specifically used to store mathematical representations (embeddings) of reports, enabling the system to instantly find similar historical incidents based on semantic meaning, not just exact keyword matches.
+
+---
+
+## 2. Models Used
+
+DRIFT uses a **Neuro-Symbolic Architecture**. This means it combines the "fuzzy", unstructured understanding of neural networks (LLMs) with the strict, deterministic logic of symbolic engines (Python rules). 
+
+### A. The "Neuro" Layer (Language Models)
+- **Configurable LLM Provider**: The system is designed to use OpenAI (`gpt-4o`) or Azure OpenAI for production, but currently defaults to a **Mock Heuristic Model** (`mock-heuristic-v3`) for local demonstration without API keys.
+- **Why?**: LLMs are perfect for reading messy, unstructured human text (the "narrative" of a safety report) and extracting structured facts. We *only* use the LLM to extract facts (like "What was the hazard?", "What was the barrier?"). We **do not** use the LLM to make the final safety decision. 
+
+### B. The "Vector" Layer (Embedding Models)
+- **Configurable Embedding Provider**: Designed to use `text-embedding-3-small` (OpenAI), but currently uses a Mock Vector generator for local development.
+- **Why?**: Embedding models convert a text narrative into a list of numbers (a 1536-dimensional vector). When a new report comes in, the system compares its vector against the database to instantly flag if a similar incident has happened before (Pattern & Recurrence detection).
+
+### C. The "Symbolic" Layer (Deterministic Engines)
+- **SIF / FPI Rules Engine**: A pure Python service.
+- **HSE Priority Engine**: A pure Python service.
+- **Why?**: AI can hallucinate. By handling the actual risk calculation in Python code, the math is 100% transparent, auditable, and deterministic. The AI simply provides the "variables" to the equation, but the human-designed HSE rules make the final call.
+
+---
+
+## 3. End-to-End Data Flow
+
+Here is exactly how a raw report becomes a prioritized action item on the dashboard.
+
+### Step 1: Ingestion & Normalization
+1. You upload a CSV dataset (e.g., `oil_sample_dataset.csv`) via the UI.
+2. The FastAPI backend receives the file, parses the CSV, and normalizes the data (handling missing dates, formatting sites, etc.).
+3. The raw records are inserted into the PostgreSQL `reports` table.
+4. The backend immediately queues a **Background Task** to run the Intelligence Pipeline so the user doesn't have to wait for a spinning loading screen.
+
+### Step 2: Phase 3 - Safety Fact Extraction (The AI Reader)
+1. The background task sends the report narrative to the **AI Provider**.
+2. The AI reads the text and extracts structured `FactFields` (Activity, Equipment, Hazard, Energy Source, Exposure, Barrier, Barrier Condition, Potential Consequence).
+3. The AI also generates tailored **Suggested Actions** based on the specific hazards it found.
+4. *Output*: A structured JSON object of facts.
+
+### Step 3: Phase 4 - SIF / FPI Screening (The Rules Engine)
+1. The extracted facts are passed to the `SifScreeningService`.
+2. This Python service evaluates the *Energy Source* (e.g., Kinetic, Pressure) and the *Barrier Condition* (e.g., ABSENT, FAILED).
+3. If high energy is present and barriers failed, it mathematically triggers a **YES** or **NO** for SIF (Serious Injury or Fatality) Potential.
+4. *Output*: A SIF classification and a list of triggered reason codes.
+
+### Step 4: Phase 5 - Life-Saving Rule (LSR) Mapping
+1. The `LsrMappingService` maps the incident to standard industry Life-Saving Rules (e.g., "Working at Height", "Hot Work", "Energy Isolation") based on the extracted Activity and Hazard.
+2. *Output*: Mapped LSRs.
+
+### Step 5: Phase 5 - Priority Engine Calculation
+1. The `PriorityService` gathers all previous outputs (SIF status, Barrier weakness, etc.).
+2. It applies a weighted mathematical formula:
+   - SIF Potential adds significant weight.
+   - A FAILED barrier adds more weight than a DEGRADED barrier.
+3. The engine outputs a final **Priority Score** (0 to 100).
+4. Based on thresholds, it assigns a **Priority Level**: `CRITICAL`, `HIGH_PRIORITY_SIF_FPI_PRECURSOR`, `SAFETY_REVIEW`, or `ROUTINE`.
+
+### Step 6: Presentation to the User
+1. The database is updated with the final `safety_analysis`.
+2. The Frontend queries the API. The reports now dynamically appear in the **Priority Queue** sorted by their calculated score.
+3. The HSE Professional reviews the AI's transparent reasoning, accepts or overrides the priority, and takes the suggested actions. **The human always remains the final authority.**

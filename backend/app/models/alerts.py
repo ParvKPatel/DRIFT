@@ -1,9 +1,15 @@
-from typing import Optional, Any
+from __future__ import annotations
+from typing import Optional, List, Any, TYPE_CHECKING
 from datetime import datetime
 from sqlalchemy import Integer, String, Float, Text, DateTime, ForeignKey, JSON, Enum as SQLEnum, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 from app.schemas.enums import AlertType, PriorityLevel
+
+if TYPE_CHECKING:
+    from app.models.reports import Report
+    from app.models.clusters import Cluster
+    from app.models.reviews import Review
 
 
 class Alert(Base):
@@ -29,6 +35,6 @@ class Alert(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
 
-    report = relationship("Report", back_populates="alerts")
-    cluster = relationship("Cluster", back_populates="alerts")
-    reviews = relationship("Review", back_populates="alert")
+    report: Mapped[Optional[Report]] = relationship("Report", back_populates="alerts")
+    cluster: Mapped[Optional[Cluster]] = relationship("Cluster", back_populates="alerts")
+    reviews: Mapped[List[Review]] = relationship("Review", back_populates="alert")

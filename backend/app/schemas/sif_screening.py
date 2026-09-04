@@ -33,7 +33,7 @@ class RuleTrigger(BaseModel):
     """Details of a deterministic safety rule that fired during screening."""
     rule_id: str = Field(..., description="Canonical rule ID, e.g. RULE-001")
     rule_name: str = Field(..., description="Human readable rule name")
-    reason_code: str = Field(..., description="Standardized OIL SENTINEL reason code, e.g. SIF-001")
+    reason_code: str = Field(..., description="Standardized DRIFT reason code, e.g. SIF-001")
     description: str = Field(..., description="Detailed explanation of why rule triggered")
     signal_strength: float = Field(1.0, ge=0.0, le=1.0, description="Rule signal weight")
     evidence_refs: List[str] = Field(default_factory=list, description="Associated evidence quotes from narrative")

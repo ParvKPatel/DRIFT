@@ -81,7 +81,7 @@ class PriorityService:
         sa.priority_score = result.priority_score
         sa.priority_level = result.priority_level
         sa.priority_reason_codes = json.dumps(result.priority_reason_codes)
-        sa.priority_override = result.priority_override
+        sa.priority_override = result.priority_override  # type: ignore
         sa.priority_version = result.priority_version
         sa.priority_calculated_at = now
 

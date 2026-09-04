@@ -98,7 +98,7 @@ class CSVIngestionService:
         file_content: bytes,
         filename: str,
         provenance: ProvenanceType = ProvenanceType.OIL_EXPORT
-    ) -> IngestionResultResponse:
+    ) -> Tuple[IngestionResultResponse, List[str]]:
         ingestion_id = f"ING-{uuid.uuid4().hex[:8].upper()}"
         
         try:
@@ -120,7 +120,7 @@ class CSVIngestionService:
                 imported_rows=0,
                 errors=[RowValidationError(row_number=0, error_type="ERROR", message="CSV file is completely empty")],
                 message="Failed: Empty CSV file"
-            )
+            ), []
 
         header_map = {idx: normalize_header(h) for idx, h in enumerate(raw_headers)}
 
@@ -288,4 +288,4 @@ class CSVIngestionService:
             warnings=warnings,
             field_completeness=quality_stats,
             message=f"Successfully imported {imported_count} of {total_rows} safety reports."
-        )
+        ), [str(r.report_id) for r in reports_to_insert]

@@ -28,7 +28,7 @@ All backend endpoints are prefixed with `/api/v1`.
 - **Response**:
 ```json
 {
-  "application_name": "OIL SENTINEL",
+  "application_name": "DRIFT",
   "version": "0.1.0-phase1",
   "environment": "development",
   "api_prefix": "/api/v1",

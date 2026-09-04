@@ -91,14 +91,18 @@ class LocalSentenceTransformerProvider(EmbeddingProvider):
     def embed_text(self, text: str) -> List[float]:
         if hasattr(self, '_fallback') and self._fallback:
             return self._fallback.embed_text(text)
-        vec = self._model.encode(text, normalize_embeddings=True)
-        return vec.tolist()
+        if self._model is not None:
+            vec = self._model.encode(text, normalize_embeddings=True)
+            return vec.tolist()
+        return MockEmbeddingProvider().embed_text(text)
 
     def embed_batch(self, texts: List[str]) -> List[List[float]]:
         if hasattr(self, '_fallback') and self._fallback:
             return self._fallback.embed_batch(texts)
-        vecs = self._model.encode(texts, normalize_embeddings=True)
-        return [v.tolist() for v in vecs]
+        if self._model is not None:
+            vecs = self._model.encode(texts, normalize_embeddings=True)
+            return [v.tolist() for v in vecs]
+        return MockEmbeddingProvider().embed_batch(texts)
 
 
 class EmbeddingFactory:

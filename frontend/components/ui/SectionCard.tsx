@@ -17,21 +17,21 @@ export const SectionCard: React.FC<SectionCardProps> = ({
   className,
 }) => {
   return (
-    <div className={cn('bg-transparent border border-industrial-800 rounded-sm overflow-hidden', className)}>
-      <div className="px-5 py-3 border-b border-industrial-800 flex items-center justify-between bg-industrial-900">
+    <div className={cn('', className)}>
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-sm font-sans font-bold uppercase tracking-wider text-industrial-100">
+          <h3 className="text-[15px] font-semibold text-industrial-100">
             {title}
           </h3>
           {subtitle && (
-            <p className="text-xs text-industrial-500 font-sans mt-0.5">
+            <p className="text-[13px] text-industrial-600 mt-0.5">
               {subtitle}
             </p>
           )}
         </div>
         {action && <div>{action}</div>}
       </div>
-      <div className="p-5">{children}</div>
+      <div>{children}</div>
     </div>
   );
 };

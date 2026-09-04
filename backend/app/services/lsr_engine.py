@@ -1,8 +1,8 @@
 """
-Phase 5 — OIL SENTINEL Life-Saving Rule (LSR) Engine
+Phase 5 — DRIFT Life-Saving Rule (LSR) Engine
 
 Evaluates Phase 3 Safety Facts and verbatim report narrative to map
-incidents to the 9 official OIL SENTINEL Life-Saving Rules:
+incidents to the 9 official DRIFT Life-Saving Rules:
 
 1. Bypassing Safety Controls
 2. Confined Space

@@ -1,5 +1,5 @@
 """
-Phase 5 — OIL SENTINEL HSE Priority Engine
+Phase 5 — DRIFT HSE Priority Engine
 
 Calculates a transparent 0–100 HSE Prioritisation Score and Priority Level
 to rank safety reports for human HSE review attention.

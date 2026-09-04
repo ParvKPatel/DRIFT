@@ -5,6 +5,8 @@ import { AppShell } from '@/components/layout/AppShell';
 import { SectionCard } from '@/components/ui/SectionCard';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { DataTable, Column } from '@/components/ui/DataTable';
+import { PriorityBadge } from '@/components/ui/PriorityBadge';
+import { StatusBadge } from '@/components/ui/StatusBadge';
 import { SourceReport } from '@/types';
 import { FileText, Search, Upload, RefreshCw, Database } from 'lucide-react';
 import Link from 'next/link';
@@ -60,124 +62,55 @@ export default function ReportsPage() {
 
   const columns: Column<SourceReport>[] = [
     {
+      header: 'Priority',
+      accessor: (r) => (
+        <PriorityBadge level={r.priority_level} />
+      ),
+    },
+    {
       header: 'Report ID',
       accessor: (r) => (
-        <Link href={`/reports/${r.report_id}`} className="font-mono font-semibold text-blue-400 hover:underline">
+        <Link href={`/reports/${r.report_id}`} className="font-semibold text-industrial-200 hover:text-industrial-400 transition-colors">
           {r.report_id}
         </Link>
       ),
     },
     {
+      header: 'Issue',
+      accessor: (r) => (
+        <span className="truncate max-w-xs block text-industrial-500 text-[13px]">
+          {r.fixed_short_description || r.narrative?.slice(0, 60)}
+        </span>
+      ),
+    },
+    { 
+      header: 'Site', 
+      accessor: (r) => (
+        <span className="text-[13px] text-industrial-500">
+          {r.site || '—'}
+        </span>
+      )
+    },
+    {
       header: 'Date',
-      accessor: (r) => r.report_date ? String(r.report_date) : '—',
-    },
-    { header: 'Site', accessor: (r) => r.site || '—' },
-    { header: 'Functional Location', accessor: (r) => r.functional_location || '—' },
-    { header: 'Incident Type', accessor: (r) => r.incident_type || '—' },
-    {
-      header: 'Incident Cause (Source)',
       accessor: (r) => (
-        <span className="font-mono text-emerald-300">
-          {r.incident_cause || '—'}
+        <span className="text-[12px] text-industrial-600">
+          {r.report_date 
+            ? String(r.report_date).substring(0,10) 
+            : r.created_at 
+              ? String(r.created_at).substring(0,10) 
+              : '—'}
         </span>
       ),
     },
     {
-      header: 'Short Description',
+      header: 'Action',
       accessor: (r) => (
-        <span className="truncate max-w-xs block text-industrial-300">
-          {r.fixed_short_description || r.narrative}
-        </span>
+        <Link href={`/reports/${r.report_id}`} className="text-[12px] font-medium text-blue-500 hover:text-blue-400 transition-colors">
+          View Details
+        </Link>
       ),
-    },
-    {
-      header: 'Provenance',
-      accessor: (r) => (
-        <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold uppercase ${
-          r.provenance === 'SYNTHETIC' 
-            ? 'bg-purple-950/80 text-purple-300 border border-purple-800' 
-            : 'bg-blue-950/80 text-blue-300 border border-blue-800'
-        }`}>
-          {r.provenance || 'OIL_EXPORT'}
-        </span>
-      ),
-    },
-    {
-      header: 'AI Analysis',
-      accessor: (r) => (
-        <span className={`px-2 py-0.5 rounded text-[9px] font-mono font-semibold uppercase ${
-          r.analysis_status === 'COMPLETED'
-            ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-800'
-            : r.analysis_status === 'PROCESSING'
-              ? 'bg-blue-950/80 text-blue-300 border border-blue-800'
-              : 'bg-industrial-900 text-industrial-500 border border-industrial-800'
-        }`}>
-          {r.analysis_status || 'NOT_ANALYZED'}
-        </span>
-      ),
-    },
-    {
-      header: 'SIF/FPI Potential',
-      accessor: (r) => {
-        const val = r.sif_fpi_potential;
-        if (val === 'YES') {
-          return (
-            <span className="px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-red-950/90 text-red-300 border border-red-700">
-              HIGH / YES
-            </span>
-          );
-        }
-        if (val === 'UNCERTAIN') {
-          return (
-            <span className="px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-amber-950/90 text-amber-300 border border-amber-700">
-              UNCERTAIN
-            </span>
-          );
-        }
-        if (val === 'NO') {
-          return (
-            <span className="px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-emerald-950/90 text-emerald-300 border border-emerald-800">
-              NO
-            </span>
-          );
-        }
-        return (
-          <span className="px-2 py-0.5 rounded text-[9px] font-mono font-semibold uppercase text-industrial-500 bg-industrial-900 border border-industrial-800">
-            UNSCREENED
-          </span>
-        );
-      },
-    },
-    {
-      header: 'Life-Saving Rule',
-      accessor: (r) => (
-        <span className="font-mono text-purple-300 text-xs">
-          {r.primary_life_saving_rule || '—'}
-        </span>
-      ),
-    },
-    {
-      header: 'HSE Priority',
-      accessor: (r) => {
-        const lvl = r.priority_level;
-        const score = r.priority_score;
-        if (!lvl) return <span className="text-industrial-500 text-[10px] font-mono">—</span>;
-
-        const map: Record<string, string> = {
-          CRITICAL: 'bg-red-950/90 text-red-300 border-red-700 font-bold',
-          HIGH_PRIORITY_SIF_FPI_PRECURSOR: 'bg-orange-950/90 text-orange-300 border-orange-700 font-bold',
-          SAFETY_REVIEW: 'bg-amber-950/90 text-amber-300 border-amber-700 font-semibold',
-          ROUTINE: 'bg-emerald-950/90 text-emerald-300 border-emerald-800',
-          UNCERTAIN: 'bg-industrial-900 text-industrial-400 border-industrial-700',
-        };
-        const cls = map[lvl] || map.UNCERTAIN;
-        return (
-          <span className={`px-2 py-0.5 rounded text-[9px] font-mono uppercase border ${cls}`}>
-            {score !== undefined && score !== null ? `[${score}] ` : ''}{lvl.replace('_PRECURSOR', '')}
-          </span>
-        );
-      },
-    },
+    }
   ];
 
   return (

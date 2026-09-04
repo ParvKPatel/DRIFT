@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'OIL SENTINEL - SIF Precursor Intelligence Engine',
-  description: 'AI/NLP Engine to Detect Serious Injury & Fatality (SIF) Precursors in Safety Reports',
+  title: 'DRIFT — HSE Intelligence',
+  description: 'HSE Precursor Intelligence Engine for Safety-Critical Operations',
 };
 
 export default function RootLayout({
@@ -12,8 +12,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className="font-sans antialiased bg-industrial-950 text-industrial-100">
+    <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
+      <body>
         {children}
       </body>
     </html>

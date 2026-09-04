@@ -1,5 +1,5 @@
 """
-OpenAI Safety Extraction Provider for OIL SENTINEL
+OpenAI Safety Extraction Provider for DRIFT
 
 Uses the OpenAI Chat Completions API with JSON response mode to extract
 structured safety facts from safety narratives.
@@ -222,3 +222,63 @@ class OpenAISafetyExtractionProvider(SafetyExtractionProvider):
             f"[OpenAIProvider] Extraction completed for report={report_id}"
         )
         return SafetyFactsExtractionResponse(**fact_kwargs, is_mock=is_mock, extraction_notes=extraction_notes)
+
+    async def generate_suggested_actions(
+        self,
+        narrative: str,
+        hazard: str,
+        barrier_condition: str,
+        life_saving_rule: str,
+        previous_actions: str = "",
+    ) -> tuple[list[str], str]:
+        prompt = (
+            "You are an expert HSE professional advising a safety officer. "
+            "Your task is to 'connect the dots' by reviewing the incident details and any previously taken actions, "
+            "and then suggest what further steps or long-term controls the human officer should consider implementing.\n\n"
+            f"Narrative: {narrative}\n"
+            f"Hazard: {hazard}\n"
+            f"Barrier Condition: {barrier_condition}\n"
+            f"Life-Saving Rule: {life_saving_rule}\n"
+            f"Previously Taken Actions: {previous_actions or 'None stated'}\n\n"
+            "Guidelines:\n"
+            "- Acknowledge the previously taken actions (if any) and suggest how to build upon them or address root causes.\n"
+            "- Tone must be advisory: these are SUGGESTIONS for the human officer. The human retains final authority.\n"
+            "- Provide 3 to 5 specific, actionable, evidence-based recommendations.\n"
+            "- Return a JSON object strictly matching this schema:\n"
+            '{\n  "actions": ["action 1", "action 2", "action 3"],\n  "reasoning": "Explanation for how these suggestions connect to the past actions and address the root cause"\n}'
+        )
+
+        payload = {
+            "model": self.model,
+            "response_format": {"type": "json_object"},
+            "messages": [
+                {"role": "system", "content": "You are a helpful safety assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": 0.2,
+        }
+
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(OPENAI_CHAT_URL, json=payload, headers=headers)
+                response.raise_for_status()
+                data = response.json()
+                content = data["choices"][0]["message"]["content"]
+                result = json.loads(content)
+                actions = result.get("actions", [])
+                reasoning = result.get("reasoning", "")
+                
+                # Enforce limit of 5 actions max
+                if isinstance(actions, list):
+                    actions = actions[:5]
+                else:
+                    actions = []
+                return actions, reasoning
+        except Exception as exc:
+            logger.error(f"[OpenAIProvider] Action generation failed: {exc}")
+            return [], ""

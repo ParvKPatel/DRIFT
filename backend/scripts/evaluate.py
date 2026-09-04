@@ -22,7 +22,7 @@ from app.services.evaluation_service import EvaluationService
 
 async def main():
     print("=" * 70)
-    print("OIL SENTINEL — Model Evaluation & Benchmarking Suite")
+    print("DRIFT — Model Evaluation & Benchmarking Suite")
     print("Dataset: SYNTHETIC / DEMO EVALUATION DATA (Reference Standard)")
     print("=" * 70)
 

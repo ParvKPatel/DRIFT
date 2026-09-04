@@ -6,7 +6,7 @@ Provides GET /api/v1/reports/{report_id}/similar endpoint logic.
 """
 
 import json
-from typing import List, Optional
+from typing import List, Optional, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload

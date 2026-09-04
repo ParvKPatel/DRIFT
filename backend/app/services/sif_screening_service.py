@@ -21,7 +21,7 @@ from sqlalchemy import select
 
 from app.models.reports import Report
 from app.models.safety_analysis import SafetyAnalysis
-from app.schemas.enums import AnalysisStatus, ScreeningStatus
+from app.schemas.enums import AnalysisStatus, ScreeningStatus, SifDecision
 from app.schemas.sif_screening import (
     SifScreeningResult,
     BatchSifScreeningResponse,

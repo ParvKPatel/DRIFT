@@ -16,6 +16,6 @@ async def test_meta_endpoint(async_client: AsyncClient):
     assert response.status_code == 200
     data = response.json()
     assert "application_name" in data
-    assert data["application_name"] == "OIL SENTINEL"
+    assert data["application_name"] == "DRIFT"
     assert "version" in data
     assert "environment" in data

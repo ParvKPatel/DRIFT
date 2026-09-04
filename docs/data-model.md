@@ -2,7 +2,7 @@
 
 ## 1. Domain Overview & Core Principles
 
-The **OIL SENTINEL** database schema strictly enforces the separation between **RAW SOURCE REPORT DATA** and **AI-DERIVED SAFETY ANALYSIS**.
+The **DRIFT** database schema strictly enforces the separation between **RAW SOURCE REPORT DATA** and **AI-DERIVED SAFETY ANALYSIS**.
 
 1. **Source Data Preservation**: Raw source reports in [`reports`](#2-raw-source-report-schema-reports-table) preserve exact field reporting without modification (e.g. `incident_cause = "IMPROPER MATERIAL HANDLING"`).
 2. **Missing vs Uncertainty**: Missing source fields are stored strictly as `NULL` (`None`). Analytical uncertainty is represented by explicit `UNKNOWN` / `UNCERTAIN` enums in [`safety_analysis`](#3-ai-derived-safety-facts-schema-safety_analysis-table).

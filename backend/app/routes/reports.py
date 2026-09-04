@@ -1,16 +1,16 @@
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Query, status
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Query, status, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, or_
 from typing import List, Optional
 
-from app.database import get_db
+from app.database import get_db, AsyncSessionLocal
 from app.models.reports import Report
 from app.schemas.reports import (
     ReportRead,
     ReportListResponse,
     ReportStatsResponse
 )
-from app.schemas.ingestion import IngestionResultResponse
+from app.schemas.ingestion import IngestionResultResponse, AnalysisProgress
 from app.schemas.safety_extraction import (
     AnalysisRequest,
     BatchAnalysisRequest,
@@ -179,6 +179,7 @@ async def seed_demo_data(db: AsyncSession = Depends(get_db)):
 
 @router.post("/upload", response_model=IngestionResultResponse, summary="Upload CSV Safety Dataset")
 async def upload_reports_csv(
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     db: AsyncSession = Depends(get_db)
 ):
@@ -195,12 +196,68 @@ async def upload_reports_csv(
     logger.info(f"Report dataset upload requested: {file.filename}")
     content = await file.read()
     
-    result = await CSVIngestionService.process_csv_upload(
+    result, inserted_report_ids = await CSVIngestionService.process_csv_upload(
         db=db,
         file_content=content,
         filename=file.filename
     )
+
+    if inserted_report_ids:
+        background_tasks.add_task(run_background_intelligence, inserted_report_ids)
+
     return result
+
+
+async def run_background_intelligence(report_ids: List[str]):
+    """Background task to run the full intelligence pipeline on newly uploaded reports."""
+    logger.info(f"Background intelligence task started for {len(report_ids)} reports.")
+    async with AsyncSessionLocal() as session:
+        for rid in report_ids:
+            try:
+                await IntelligenceService.process_full_intelligence(
+                    report_id=rid,
+                    db=session,
+                    force_reanalyze=False
+                )
+            except Exception as e:
+                logger.error(f"Background intelligence failed for {rid}: {e}")
+                # Continue with next report
+                pass
+    logger.info("Background intelligence task completed.")
+
+
+@router.get("/ingestion-status/{filename}", response_model=AnalysisProgress, summary="Get Ingestion Analysis Progress")
+async def get_ingestion_progress(filename: str, db: AsyncSession = Depends(get_db)):
+    """Returns the progress of background AI analysis for a specific uploaded file."""
+    # Count total imported from this file
+    total_res = await db.execute(select(func.count(Report.id)).where(Report.source_file == filename))
+    total_imported = total_res.scalar_one() or 0
+
+    if total_imported == 0:
+        return AnalysisProgress(
+            filename=filename,
+            total_imported=0,
+            total_analyzed=0,
+            status="COMPLETED"
+        )
+
+    # Count analyzed from this file
+    from app.schemas.enums import AnalysisStatus
+    analyzed_res = await db.execute(
+        select(func.count(Report.id))
+        .where(Report.source_file == filename)
+        .where(Report.analysis_status == AnalysisStatus.COMPLETED)
+    )
+    total_analyzed = analyzed_res.scalar_one() or 0
+
+    status = "COMPLETED" if total_analyzed >= total_imported else "PROCESSING"
+    
+    return AnalysisProgress(
+        filename=filename,
+        total_imported=total_imported,
+        total_analyzed=total_analyzed,
+        status=status
+    )
 
 
 @router.get("/{report_id}", response_model=ReportRead, summary="Get Report Detail by ID")
@@ -339,7 +396,7 @@ async def batch_screen_sif(
 ):
     """
     Triggers SIF/FPI precursor screening for multiple safety reports using the
-    deterministic OIL SENTINEL Safety Rule Engine.
+    deterministic DRIFT Safety Rule Engine.
 
     - If report_ids is provided: screens those specific reports.
     - If report_ids is None: screens all COMPLETED reports that are unscreened.

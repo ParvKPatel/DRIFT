@@ -6,7 +6,7 @@ from typing import Optional
 
 class Settings(BaseSettings):
     APP_ENV: str = Field(default="development")
-    APP_NAME: str = Field(default="OIL SENTINEL")
+    APP_NAME: str = Field(default="DRIFT")
     API_V1_PREFIX: str = Field(default="/api/v1")
     LOG_LEVEL: str = Field(default="INFO")
 

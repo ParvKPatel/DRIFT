@@ -1,1 +1,1 @@
-"""OIL SENTINEL - AI Abstraction Package"""
+"""DRIFT - AI Abstraction Package"""

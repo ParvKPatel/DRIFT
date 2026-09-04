@@ -1,1 +1,1 @@
-"""OIL SENTINEL - Backend Application Package"""
+"""DRIFT - Backend Application Package"""

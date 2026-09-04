@@ -17,7 +17,7 @@ class EvaluationRun(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
     dataset_name: Mapped[str] = mapped_column(String(200), nullable=False, default="Synthetic Demo Reference Dataset")
     dataset_version: Mapped[str] = mapped_column(String(50), nullable=False, default="v1.0-synthetic")
-    pipeline_version: Mapped[str] = mapped_column(String(50), nullable=False, default="oil-sentinel-v1")
+    pipeline_version: Mapped[str] = mapped_column(String(50), nullable=False, default="drift-v1")
 
     sample_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 

@@ -2,12 +2,9 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { AppShell } from '@/components/layout/AppShell';
-import { SectionCard } from '@/components/ui/SectionCard';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { DataTable, Column } from '@/components/ui/DataTable';
 import { BarrierSummary } from '@/types';
-import { Shield, RefreshCw, Download, AlertTriangle, ArrowRight } from 'lucide-react';
-import Link from 'next/link';
+import { Shield, RefreshCw, AlertTriangle, CheckCircle2, XCircle, AlertCircle, ArrowDownCircle } from 'lucide-react';
 
 export default function BarriersPage() {
   const [barriers, setBarriers] = useState<BarrierSummary[]>([]);
@@ -32,102 +29,90 @@ export default function BarriersPage() {
     fetchBarriers();
   }, [fetchBarriers]);
 
-  const columns: Column<BarrierSummary>[] = [
-    {
-      header: 'Barrier',
-      accessor: (b) => (
-        <span className="font-mono text-xs font-bold text-industrial-100 block">
-          {b.barrier}
-        </span>
-      ),
-    },
-    {
-      header: 'Weakness Score',
-      accessor: (b) => (
-        <div className="p-1.5 bg-industrial-950 border border-industrial-700 rounded text-center min-w-[50px]">
-          <span className="text-xs font-mono font-bold text-red-400 block">{b.weakness_score}</span>
-        </div>
-      ),
-    },
-    {
-      header: 'Mentions',
-      accessor: (b) => <span className="font-mono text-xs text-industrial-300">{b.total_mentions}</span>,
-    },
-    {
-      header: 'Failed',
-      accessor: (b) => (
-        <span className={`px-2 py-0.5 rounded text-xs font-mono font-bold ${b.failed_count > 0 ? 'bg-red-950 text-red-300 border border-red-800' : 'text-industrial-500'}`}>
-          {b.failed_count}
-        </span>
-      ),
-    },
-    {
-      header: 'Degraded',
-      accessor: (b) => (
-        <span className={`px-2 py-0.5 rounded text-xs font-mono font-bold ${b.degraded_count > 0 ? 'bg-amber-950 text-amber-300 border border-amber-800' : 'text-industrial-500'}`}>
-          {b.degraded_count}
-        </span>
-      ),
-    },
-    {
-      header: 'Absent',
-      accessor: (b) => (
-        <span className={`px-2 py-0.5 rounded text-xs font-mono font-bold ${b.absent_count > 0 ? 'bg-purple-950 text-purple-300 border border-purple-800' : 'text-industrial-500'}`}>
-          {b.absent_count}
-        </span>
-      ),
-    },
-    {
-      header: 'Intact',
-      accessor: (b) => (
-        <span className="text-xs font-mono text-emerald-400">{b.intact_count}</span>
-      ),
-    },
-    {
-      header: 'Unknown State',
-      accessor: (b) => (
-        <span className="text-xs font-mono text-industrial-500">{b.unknown_count}</span>
-      ),
-    },
-    {
-      header: 'SIF Precursors',
-      accessor: (b) => (
-        <span className="text-xs font-mono font-bold text-red-400">{b.sif_count}</span>
-      ),
-    },
-  ];
-
   return (
-    <AppShell title="Physical & Procedural Barrier Intelligence">
-      <div className="space-y-6 max-w-6xl mx-auto">
-        <SectionCard
-          title="Safety Barrier Weakness & Condition Matrix"
-          subtitle="Ranked by failure evidence (Failed, Absent, Degraded). Unknown states are treated strictly separately from intact or failed controls."
-          action={
-            <a
-              href="/api/v1/dashboard/export/barriers"
-              download
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-industrial-900 hover:bg-industrial-800 border border-industrial-700 text-xs font-mono text-industrial-200 transition-colors"
-            >
-              <Download className="w-3.5 h-3.5" />
-              Export CSV
-            </a>
-          }
-        >
-          {loading ? (
-            <div className="p-8 text-center font-mono text-xs text-industrial-400 flex items-center justify-center gap-2">
-              <RefreshCw className="w-4 h-4 animate-spin text-blue-400" />
-              Loading barrier intelligence matrix...
-            </div>
-          ) : barriers.length === 0 ? (
-            <EmptyState
-              title="No Barrier Degradation Data"
-              description="Extract AI safety facts to track physical & procedural barrier condition distribution."
-            />
-          ) : (
-            <DataTable columns={columns} data={barriers} />
-          )}
-        </SectionCard>
+    <AppShell title="Controls Attention">
+      <div className="space-y-8 max-w-5xl mx-auto pb-12">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-industrial-850 pb-6">
+          <div>
+            <h1 className="text-2xl font-semibold text-industrial-100">Controls Requiring Attention</h1>
+            <p className="text-[13px] text-industrial-500 mt-1">Physical and procedural barriers with highest failure or degradation rates.</p>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="py-12 text-center text-[12px] text-industrial-500 flex items-center justify-center gap-2">
+            <RefreshCw className="w-4 h-4 animate-spin text-blue-500" />
+            Analyzing barrier health...
+          </div>
+        ) : barriers.length === 0 ? (
+          <EmptyState
+            title="No Control Data Found"
+            description="Extract AI safety facts to track physical & procedural control conditions."
+          />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {barriers.map((b) => {
+              const totalIssues = b.failed_count + b.absent_count + b.degraded_count;
+              const isCritical = b.weakness_score > 50 || totalIssues > 2;
+
+              return (
+                <div key={b.barrier} className="flex flex-col p-5 bg-industrial-950 border border-industrial-850 rounded hover:border-industrial-700 transition-colors">
+                  <div className="flex items-start justify-between mb-4">
+                    <h3 className="text-[14px] font-semibold text-industrial-200 flex-1 pr-3 flex items-center gap-2">
+                      <Shield className={`w-4 h-4 ${isCritical ? 'text-red-500' : 'text-industrial-500'}`} />
+                      {b.barrier}
+                    </h3>
+                    <div className="flex flex-col items-end">
+                      <span className="text-[10px] text-industrial-600 uppercase mb-0.5">Weakness</span>
+                      <span className={`text-[14px] font-bold ${isCritical ? 'text-red-500' : 'text-amber-500'}`}>
+                        {b.weakness_score}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div className="p-2.5 bg-industrial-900/50 rounded flex justify-between items-center border border-red-900/20">
+                      <span className="text-[11px] uppercase text-industrial-500 flex items-center gap-1">
+                        <XCircle className="w-3 h-3 text-red-500" /> Failed
+                      </span>
+                      <span className="text-[12px] font-semibold text-industrial-200">{b.failed_count}</span>
+                    </div>
+                    <div className="p-2.5 bg-industrial-900/50 rounded flex justify-between items-center border border-amber-900/20">
+                      <span className="text-[11px] uppercase text-industrial-500 flex items-center gap-1">
+                        <ArrowDownCircle className="w-3 h-3 text-amber-500" /> Degraded
+                      </span>
+                      <span className="text-[12px] font-semibold text-industrial-200">{b.degraded_count}</span>
+                    </div>
+                    <div className="p-2.5 bg-industrial-900/50 rounded flex justify-between items-center border border-purple-900/20">
+                      <span className="text-[11px] uppercase text-industrial-500 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3 text-purple-500" /> Absent
+                      </span>
+                      <span className="text-[12px] font-semibold text-industrial-200">{b.absent_count}</span>
+                    </div>
+                    <div className="p-2.5 bg-industrial-900/50 rounded flex justify-between items-center border border-emerald-900/20">
+                      <span className="text-[11px] uppercase text-industrial-500 flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-500" /> Intact
+                      </span>
+                      <span className="text-[12px] font-semibold text-industrial-200">{b.intact_count}</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-auto pt-3 border-t border-industrial-900 flex justify-between items-center">
+                    <div className="text-[11px] text-industrial-500">
+                      {b.total_mentions} Total Mentions
+                    </div>
+                    {b.sif_count > 0 && (
+                      <div className="flex items-center gap-1.5 px-2 py-1 bg-red-950/40 rounded text-red-500 text-[10px] font-medium uppercase">
+                        <AlertTriangle className="w-3 h-3" /> {b.sif_count} SIF Precursors
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </AppShell>
   );

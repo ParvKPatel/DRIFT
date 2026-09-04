@@ -37,7 +37,31 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadSuccess, classNa
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [resultData, setResultData] = useState<IngestionResult | null>(null);
   const [showLogs, setShowLogs] = useState(false);
+  const [analysisProgress, setAnalysisProgress] = useState<{ total_imported: number; total_analyzed: number; status: string } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Clean up interval on unmount
+  React.useEffect(() => {
+    return () => {
+      if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+    };
+  }, []);
+
+  const pollProgress = async (filename: string) => {
+    try {
+      const res = await fetch(`/api/v1/reports/ingestion-status/${encodeURIComponent(filename)}`);
+      if (res.ok) {
+        const data = await res.json();
+        setAnalysisProgress(data);
+        if (data.status === 'COMPLETED') {
+          if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch ingestion status', err);
+    }
+  };
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -99,6 +123,14 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadSuccess, classNa
       const data: IngestionResult = await res.json();
       setResultData(data);
       setUploadStatus('success');
+
+      if (data.imported_rows > 0) {
+        setAnalysisProgress({ total_imported: data.imported_rows, total_analyzed: 0, status: 'PROCESSING' });
+        pollIntervalRef.current = setInterval(() => pollProgress(data.filename), 2000);
+      } else {
+        setAnalysisProgress({ total_imported: 0, total_analyzed: 0, status: 'COMPLETED' });
+      }
+
       if (onUploadSuccess) onUploadSuccess(data);
     } catch (err: any) {
       setUploadStatus('error');
@@ -191,10 +223,13 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onUploadSuccess, classNa
               <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
               <div>
                 <h5 className="text-xs font-mono font-semibold text-industrial-100 uppercase tracking-wide">
-                  Ingestion Complete: {resultData.filename}
+                  {analysisProgress?.status === 'COMPLETED' ? 'Ingestion & Analysis Complete' : 'Analyzing Reports...'}
                 </h5>
                 <p className="text-xs text-industrial-400 font-mono mt-0.5">
-                  ID: {resultData.ingestion_id} — {resultData.message}
+                  {analysisProgress?.status === 'COMPLETED' 
+                    ? `${resultData.filename} — ${resultData.message}`
+                    : `Reports analyzed: ${analysisProgress?.total_analyzed || 0} / ${analysisProgress?.total_imported || 0}`
+                  }
                 </p>
               </div>
             </div>

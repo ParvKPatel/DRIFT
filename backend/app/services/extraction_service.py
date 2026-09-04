@@ -90,7 +90,9 @@ class SafetyExtractionService:
                 f"[ExtractionService] Report {report_id} already COMPLETED. "
                 "Returning existing analysis. Pass force_reanalyze=True to re-run."
             )
-            return await cls._build_result_from_db(report_id, db)
+            existing = await cls._build_result_from_db(report_id, db)
+            if existing is not None:
+                return existing
 
         # 3. Mark as PROCESSING
         report.analysis_status = AnalysisStatus.PROCESSING
@@ -141,6 +143,26 @@ class SafetyExtractionService:
                 extraction=extraction,
                 db=db,
             )
+
+            # 8.5 Generate suggested actions
+            try:
+                # Helper to safely get string value from FactField
+                def _val(ff):
+                    v = ff.value
+                    return str(v.value) if (v is not None and hasattr(v, "value")) else (str(v) if v is not None else None)
+
+                actions, reasoning = await provider.generate_suggested_actions(
+                    narrative=report.narrative,
+                    hazard=_val(extraction.hazard) or "",
+                    barrier_condition=_val(extraction.barrier_condition) or "",
+                    life_saving_rule=sa.life_saving_rule or "",
+                    previous_actions=report.corrective_action or "",
+                )
+                import json
+                sa.suggested_actions = json.dumps(actions)
+                sa.suggested_actions_reasoning = reasoning
+            except Exception as e:
+                logger.error(f"[ExtractionService] Failed to generate actions for report={report_id}: {e}")
 
             # 9. Update report analysis_status = COMPLETED
             report.analysis_status = AnalysisStatus.COMPLETED
@@ -267,7 +289,7 @@ class SafetyExtractionService:
         # Helper to safely get string value from FactField
         def _val(ff: FactField):
             v = ff.value
-            return str(v.value) if hasattr(v, "value") else (str(v) if v is not None else None)
+            return str(v.value) if (v is not None and hasattr(v, "value")) else (str(v) if v is not None else None)
 
         def _ev_status(ff: FactField):
             return ff.evidence_status
@@ -464,6 +486,8 @@ class SafetyExtractionService:
             potential_consequence_evidence=_get_ev("potential_consequence", sa.potential_consequence_evidence),
             potential_consequence_evidence_status=sa.potential_consequence_evidence_status,
             potential_consequence_confidence=sa.potential_consequence_confidence,
+            suggested_actions=sa.suggested_actions,
+            suggested_actions_reasoning=sa.suggested_actions_reasoning,
             evidence_items=[EvidenceItemResponse.model_validate(e) for e in ev_items],
         )
 
@@ -477,7 +501,7 @@ class SafetyExtractionService:
         """Build AnalysisResultResponse directly from fresh extraction output."""
         def _val(ff: FactField):
             v = ff.value
-            return str(v.value) if hasattr(v, "value") else (str(v) if v is not None else None)
+            return str(v.value) if (v is not None and hasattr(v, "value")) else (str(v) if v is not None else None)
 
         return AnalysisResultResponse(
             report_id=report_id,
@@ -523,6 +547,8 @@ class SafetyExtractionService:
             potential_consequence_evidence=extraction.potential_consequence.evidence,
             potential_consequence_evidence_status=extraction.potential_consequence.evidence_status,
             potential_consequence_confidence=extraction.potential_consequence.confidence,
+            suggested_actions=sa.suggested_actions,
+            suggested_actions_reasoning=sa.suggested_actions_reasoning,
             evidence_items=[EvidenceItemResponse.model_validate(e) for e in evidence_items],
         )
 
